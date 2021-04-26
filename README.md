@@ -7,6 +7,8 @@ A dev project aming to create a competitive platform for achieving live and habi
 - Frontend: Nuxt.js
 
 ## Setup
+You need to have docker installed on your system to run this project.
+
 1. Clone repository
 2. run `make`
 3. run `make install-dependencies`
