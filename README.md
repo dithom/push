@@ -12,6 +12,10 @@ A dev project aming to create a competitive platform for achieving live and habi
 3. run `make install-dependencies`
 
 ## Development
+Run `make` to start docker containers.
+
 To start a dev server for the api run `make docker-ssh-api` and then `npm start` from inside the api container.
 
 Same goes for the frontend with `make docker-ssh-frontend` followed by `npm run dev` from inside the frontend container.
+
+Run `make docker-stop` to shut down docker containers after a dev session.
