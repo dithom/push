@@ -2,9 +2,9 @@
 
 A dev project aming to create a competitive platform for achieving live and habit goals together.
 
-DB: Mongo
-API: Express.js
-Frontend: Nuxt.js
+- DB: Mongo
+- API: Express.js
+- Frontend: Nuxt.js
 
 ## Setup
 1. Clone repository
