@@ -17,13 +17,13 @@ You need to have docker installed on your system to run this project.
 ## Development
 Run `make` to start docker containers.
 
-To start a dev server for the api run `make docker-ssh-api` and then
+To start the api server run `make docker-ssh-api` and then
 `npm start` from inside the api container. This will start the server on
-`localhost:3000`
+`localhost:3000`.
 
 Same goes for the frontend with `make docker-ssh-frontend` followed by
 `npm run dev` from inside the frontend container. This will start a dev server
-on `localhost`
+on `localhost`.
 
-Run `exit` to leave containers and `make docker-stop` from project root to
+Run `exit` to leave containers and `make docker-stop` in project root to
 shut down docker containers after a dev session.
