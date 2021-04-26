@@ -15,10 +15,10 @@ docker-stop:
 	@echo '\n\033[1m# Stopping docker containers ...\033[0m\n'; \
 	docker-compose -f docker-compose.dev.yml down
 
-docker-ssh-api:
+docker-attach-api:
 	docker-compose -f docker-compose.dev.yml exec api bash
 
-docker-ssh-frontend:
+docker-attach-frontend:
 	docker-compose -f docker-compose.dev.yml exec frontend bash
 
 install-dependencies:
