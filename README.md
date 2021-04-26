@@ -18,4 +18,4 @@ To start a dev server for the api run `make docker-ssh-api` and then `npm start`
 
 Same goes for the frontend with `make docker-ssh-frontend` followed by `npm run dev` from inside the frontend container.
 
-Run `make docker-stop` to shut down docker containers after a dev session.
+Run `exit` to leave containers and `make docker-stop` from project root to shut down docker containers after a dev session.
