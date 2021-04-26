@@ -1,6 +1,7 @@
-# PUSH | Reach your goals in competition
+# PUSH | Reach your goals togehter in competition
 
-A dev project aming to create a competitive platform for achieving live and habit goals together.
+A dev project aming to create a competitive platform for achieving live and
+habit goals together.
 
 - DB: Mongo
 - API: Express.js
@@ -16,8 +17,13 @@ You need to have docker installed on your system to run this project.
 ## Development
 Run `make` to start docker containers.
 
-To start a dev server for the api run `make docker-ssh-api` and then `npm start` from inside the api container.
+To start a dev server for the api run `make docker-ssh-api` and then
+`npm start` from inside the api container. This will start the server on
+`localhost:3000`
 
-Same goes for the frontend with `make docker-ssh-frontend` followed by `npm run dev` from inside the frontend container.
+Same goes for the frontend with `make docker-ssh-frontend` followed by
+`npm run dev` from inside the frontend container. This will start a dev server
+on `localhost`
 
-Run `exit` to leave containers and `make docker-stop` from project root to shut down docker containers after a dev session.
+Run `exit` to leave containers and `make docker-stop` from project root to
+shut down docker containers after a dev session.
