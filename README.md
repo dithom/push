@@ -10,8 +10,8 @@ A dev project aming to create a competitive platform for achieving live and habi
 You need to have docker installed on your system to run this project.
 
 1. Clone repository
-2. run `make`
-3. run `make install-dependencies`
+2. Run `make`
+3. Run `make install-dependencies`
 
 ## Development
 Run `make` to start docker containers.
