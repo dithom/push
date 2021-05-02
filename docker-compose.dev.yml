@@ -8,6 +8,7 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=app
 
   mongo-express:
     image: mongo-express
@@ -24,6 +25,8 @@ services:
       dockerfile: api.dev.dockerfile
     ports:
       - 3000:3000
+    links:
+      - mongo:db
     volumes:
       - ./api:/app
 
