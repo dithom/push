@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const bytes = require('bytes');
 
 router.post('/signup', async(request, response) => {
   // TODO add validation
@@ -70,8 +70,11 @@ router.post('/signin', async(request, response) => {
     });
   }
 
-  return response.json({
-    message: 'Logged in'
+  // create and assign token
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+
+  return response.header('auth-token', token).json({
+    authToken: token
   });
 });
 
