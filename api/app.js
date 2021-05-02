@@ -9,15 +9,15 @@ const app = express();
 dotenv.config();
 
 // import routes
+const indexRoute = require('./routes/index');
 const challangeRoute = require('./routes/challange');
-const userRoute = require('./routes/user');
 
 // middlewares
 app.use(express.json());
 
 // routes
-app.use('/api/v1/challange', challangeRoute)
-app.use('/api/v1/user', userRoute)
+app.use('/api/v1', indexRoute);
+app.use('/api/v1/challange', challangeRoute);
 
 // db
 mongoose.connect(
