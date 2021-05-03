@@ -4,10 +4,12 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const sendmail = require('sendmail')();
+const { body, validationResult } = require('express-validator');
 
 // import models
 const User = require('../models/User');
 const ResetPasswordRequest = require('../models/ResetPasswordRequest');
+
 
 /*
 Endpoint: Signup
@@ -15,25 +17,47 @@ Method: POST
 Parameters:
   - email
   - password
+  - username
 
 Creates a new user
 */
-router.post('/signup', async(request, response) => {
-  // TODO add validation
+
+router.post('/signup', 
+body('email').isEmail(), 
+body('password').isLength({ min: 6 }), 
+async(request, response) => {
+
+// Finds the validation errors in this request and wraps them in an object
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return response.status(400).json({ errors: errors.array() });
+  }
+
   if (!request.body.email) {
     return response.status(400).json({
       error: 'No sufficient data provided.'
     });
   }
 
-  // check user
-  const user = await User.findOne({
+  // check if user email already exists
+  const userEmail = await User.findOne({
     email: request.body.email
   });
 
-  if (user) {
+  if (userEmail) {
     return response.status(400).json({
       error: 'A user with this email already exists.'
+    });
+  }
+
+ // check if username already exists
+   const userName = await User.findOne({
+    username: request.body.username
+  });
+
+  if (userName) {
+    return response.status(400).json({
+      error: 'A user with this username already exists.'
     });
   }
 
@@ -65,7 +89,9 @@ Parameters:
 
 Returns a JWT containing the user id
 */
-router.post('/signin', async(request, response) => {
+router.post('/signin',
+body('email').isEmail(), 
+ async(request, response) => {
   // TODO add validation
   if (!request.body.email) {
     return response.status(400).json({
