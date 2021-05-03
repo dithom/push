@@ -8,7 +8,8 @@ const ResetPasswordRequestSchema = mongoose.Schema({
   },
   resetId: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   }
 });
 
