@@ -1,5 +1,3 @@
-# LOCAL_IP := $(shell ipconfig getifaddr en0)
-
 all:
 	make docker-start
 
