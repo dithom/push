@@ -3,9 +3,9 @@
 A dev project aming to create a competitive platform for achieving live and
 habit goals together.
 
-- DB: Mongo
-- API: Express.js
-- Frontend: Nuxt.js
+- DB: [MongoDB](https://www.mongodb.com/de)
+- API: [Express.js](https://expressjs.com/)
+- Frontend: [Nuxt.js](https://nuxtjs.org/)
 
 ## Setup
 You need to have Docker installed on your system to run this project.
@@ -27,3 +27,9 @@ on `localhost`.
 
 Run `exit` to leave containers and `make docker-stop` in project root to
 shut down all docker containers after a dev session.
+
+This project is optimized for [VS Code](https://code.visualstudio.com/). You
+can install the following extensions to make linting and formatting available:
+
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
