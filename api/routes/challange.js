@@ -6,7 +6,7 @@ router.get('/', auth, (request, response) => {
   return response.json([
     {
       name: 'Dummy challange',
-      requestedFromUser: request.user
+      requestedFromUserId: request.userId
     }
   ])
 });
