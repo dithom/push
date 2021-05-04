@@ -70,7 +70,6 @@ router.post(
 
     try {
       const savedNewUser = await newUser.save();
-
       return response.json(savedNewUser);
     } catch (error) {
       return response.json(error);
