@@ -1,14 +1,18 @@
-const express = require('express');
+import express from 'express';
+
+// Import middlewares
+import auth from '../middlewares/auth';
+
+// Define globals
 const router = express.Router();
-const auth = require('../middlewares/auth');
 
 router.get('/', auth, (request, response) => {
   return response.json([
     {
       name: 'Dummy challange',
-      requestedFromUserId: request.userId
-    }
-  ])
+      requestedFromUserId: request.userId,
+    },
+  ]);
 });
 
 module.exports = router;

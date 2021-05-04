@@ -1,26 +1,26 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-// import models
-const User = require('../models/User');
+// Import models
+import User from '../models/User';
 
 const auth = async (request, response, next) => {
   const token = request.header('auth-token');
 
   if (!token) {
     return response.status(401).json({
-      error: 'Access denied'
-    })
+      error: 'Access denied',
+    });
   }
 
-  // verfiy token
+  // Verfiy token
   try {
     const verifiedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-    // check user
+    // Check user
     if (verifiedToken._id) {
       try {
         const user = await User.findOne({
-          _id: verifiedToken._id
+          _id: verifiedToken._id,
         });
 
         if (user) {
@@ -29,19 +29,23 @@ const auth = async (request, response, next) => {
         }
 
         return response.status(400).json({
-          error: 'Failed to validate user.'
+          error: 'Failed to validate user.',
         });
-      } catch(error) {
+      } catch (error) {
         return response.status(400).json({
-          error: 'Error finding user.'
+          error: 'Error finding user.',
         });
       }
     }
-  } catch(error) {
+
     return response.status(400).json({
-      error: 'Token not valid.'
+      error: 'Token has wrong information.',
+    });
+  } catch (error) {
+    return response.status(400).json({
+      error: 'Token not valid.',
     });
   }
-}
+};
 
 module.exports = auth;

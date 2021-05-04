@@ -1,4 +1,12 @@
 {
   "editor.tabSize": 2,
-  "editor.rulers": [80]
+  "editor.rulers": [
+    80
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": [
+    "javascript"
+  ]
 }

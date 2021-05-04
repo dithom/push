@@ -1,17 +1,18 @@
-const { ObjectId } = require('bson');
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ResetPasswordRequestSchema = mongoose.Schema({
   user: {
-    type: ObjectId,
-    ref: 'User'
+    type: mongoose.ObjectId,
+    ref: 'User',
   },
   resetId: {
     type: String,
     required: true,
-    unique: true
-  }
+    unique: true,
+  },
 });
 
-module.exports = mongoose.model('ResetPasswordRequest',
-  ResetPasswordRequestSchema);
+module.exports = mongoose.model(
+  'ResetPasswordRequest',
+  ResetPasswordRequestSchema
+);
