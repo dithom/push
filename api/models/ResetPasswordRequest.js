@@ -2,7 +2,7 @@ const { ObjectId } = require('bson');
 const mongoose = require('mongoose');
 
 const ResetPasswordRequestSchema = mongoose.Schema({
-  userId: {
+  user: {
     type: ObjectId,
     ref: 'User'
   },
