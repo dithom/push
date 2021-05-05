@@ -1,11 +1,11 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 
-// Import middlewares
-import auth from '../middlewares/auth';
+// Import middleware
+import auth from '../middleware/auth';
 
 // Import models
-import Challange from '../models/Challange';
+import Challange from '../model/Challange';
 
 // Define globals
 const router = express.Router();

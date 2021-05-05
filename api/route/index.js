@@ -6,8 +6,8 @@ import sendmail from 'sendmail';
 import { body, validationResult } from 'express-validator';
 
 // Import models
-import User from '../models/User';
-import ResetPasswordRequest from '../models/ResetPasswordRequest';
+import User from '../model/User';
+import ResetPasswordRequest from '../model/ResetPasswordRequest';
 
 // Define globals
 const router = express.Router();

@@ -3,8 +3,8 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
 // Import routes
-import indexRoute from './routes/index';
-import challangeRoute from './routes/challange';
+import indexRoute from './route/index';
+import challangeRoute from './route/challange';
 
 // App
 const app = express();
@@ -12,7 +12,7 @@ const app = express();
 // dotenv
 dotenv.config();
 
-// Middlewares
+// Middleware
 app.use(express.json());
 
 // Routes
