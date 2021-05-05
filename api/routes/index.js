@@ -18,7 +18,7 @@ const router = express.Router();
  * @param  {string} email
  * @param  {string} password
  * @param  {string} username
- * @returns {object} Created user
+ * @returns {Object} Created user
  */
 router.post(
   '/signup',
@@ -82,7 +82,7 @@ router.post(
  * Method: POST
  * @param  {string} email
  * @param  {string} password
- * @returns {object} JWT containing the user id
+ * @returns {Object} JWT containing the user id
  */
 router.post(
   '/signin',
@@ -133,7 +133,7 @@ router.post(
  * Creates a new reset password request and sends an email.
  * Method: POST
  * @param  {string} email
- * @returns {object} Success message
+ * @returns {Object} Success message
  */
 router.post('/forgot', async (request, response) => {
   // TODO add validation
@@ -210,7 +210,7 @@ router.post('/forgot', async (request, response) => {
  * Method: POST
  * @param  {string} resetId
  * @param {string} password
- * @returns {object} Updated user
+ * @returns {Object} Updated user
  */
 router.post('/reset', async (request, response) => {
   // TODO add validation

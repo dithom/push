@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import idValidator from 'mongoose-id-validator';
 
 const ChallangeSchema = mongoose.Schema({
   name: {
@@ -15,40 +16,47 @@ const ChallangeSchema = mongoose.Schema({
   },
   category: {
     type: String,
+    enum: ['sports'],
+    default: 'sports',
     required: true,
-    min: 6,
-    max: 255,
   },
-  duration: {
-    type: Number,
+  startDate: {
+    type: Date,
     required: true,
-    min: 6,
-    max: 1023,
+  },
+  endDate: {
+    type: Date,
+    required: true,
   },
   frequency: {
     type: Number,
     required: true,
-    min: 6,
-    max: 1023,
   },
-  timeunit: {
+  frequencyUnit: {
     type: String,
     required: true,
-    min: 6,
-    max: 255,
+    enum: ['minute', 'hour', 'day', 'month'],
+    default: 'day',
   },
   visibility: {
-    type: Boolean,
+    type: String,
     required: true,
-    min: 6,
-    max: 255,
+    enum: ['public', 'private'],
+    default: 'public',
   },
-  attendees: {
-    type: Array,
-    required: true,
-    min: 6,
-    max: 1023,
-  }
+  creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  competitors: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
 });
 
-module.exports = mongoose.model('Challange', ChallangeSchema);
+module.exports = mongoose.model(
+  'Challange',
+  ChallangeSchema.plugin(idValidator)
+);
