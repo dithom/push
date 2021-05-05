@@ -60,6 +60,23 @@ router.post(
       });
     }
 
+    // Check dates
+    const startDate = new Date(request.body.startDate);
+    const endDate = new Date(request.body.endDate);
+
+    if (startDate < new Date()) {
+      return response.status(400).json({
+        error: 'The start date can not be set to earlier than today.',
+      });
+    }
+
+    if (endDate <= startDate) {
+      return response.status(400).json({
+        error:
+          'The end date can not be set to equal or earlier than the start date.',
+      });
+    }
+
     // Check if user is also in competitors
     if (request.body.competitors.includes(request.userId)) {
       return response.status(400).json({
