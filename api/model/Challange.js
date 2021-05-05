@@ -17,7 +17,6 @@ const ChallangeSchema = mongoose.Schema({
   category: {
     type: String,
     enum: ['sports'],
-    default: 'sports',
     required: true,
   },
   startDate: {
@@ -28,15 +27,18 @@ const ChallangeSchema = mongoose.Schema({
     type: Date,
     required: true,
   },
+  repetitions: {
+    type: Number,
+    required: true,
+  },
   frequency: {
     type: Number,
     required: true,
   },
-  frequencyUnit: {
+  timespan: {
     type: String,
     required: true,
-    enum: ['minute', 'hour', 'day', 'month'],
-    default: 'day',
+    enum: ['minute', 'hour', 'day', 'week', 'month'],
   },
   visibility: {
     type: String,
@@ -47,6 +49,7 @@ const ChallangeSchema = mongoose.Schema({
   creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    required: true,
   },
   competitors: [
     {

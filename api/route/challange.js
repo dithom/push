@@ -32,10 +32,11 @@ router.get('/', auth, (request, response) => {
  * @param  {string} category
  * @param  {Date} startDate
  * @param  {Date} endDate
+ * @param  {number} repetitions
  * @param  {number} frequency
- * @param  {string} frequencyUnit
+ * @param  {string} timespan
  * @param  {string} visibility
- * @param {Array<string>} competitors
+ * @param {Array<string>} [competitors]
  * @returns {Object} Created challange
  */
 router.post(
@@ -46,8 +47,9 @@ router.post(
   body('category').isString(),
   body('startDate').isDate(),
   body('endDate').isDate(),
+  body('repetitions').isNumeric(),
   body('frequency').isInt(),
-  body('frequencyUnit').isString(),
+  body('timespan').isString(),
   body('visibility').isString(),
   body('competitors').isArray(),
   async (request, response) => {
@@ -92,8 +94,9 @@ router.post(
       category: request.body.category,
       startDate: request.body.startDate,
       endDate: request.body.endDate,
+      repetitions: request.body.repetitions,
       frequency: request.body.frequency,
-      frequencyUnit: request.body.frequencyUnit,
+      timespan: request.body.timespan,
       creator: request.userId,
       visibility: request.body.visibility,
       competitors: request.body.competitors,
