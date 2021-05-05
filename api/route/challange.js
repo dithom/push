@@ -10,12 +10,20 @@ import Challange from '../model/Challange';
 // Define globals
 const router = express.Router();
 
+// TODO Find solution for challange feeds. Separate collection or put it into challange?
+
 /**
  * Finds one or more challanges connected to signed in user
+ * (creator or competitor)
  * Method: GET
  * @returns {Array<Object>} List of challanges
  */
 router.get('/', auth, (request, response) => {
+  // TODO Return running challanges for signed in user at /
+  // TODO Return a specific challange for signed in user with /?id
+  // TODO Return challange(s) including feed for signed in user with /?feed
+  // TODO Return challange(s) including archived for signed in user with /?archived
+
   return response.json([
     {
       name: 'Dummy challange',
