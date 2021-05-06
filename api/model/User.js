@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+// TODO Find solution for archived challanges as this is a individual user setting
+
 const UserSchema = mongoose.Schema({
   email: {
     type: String,

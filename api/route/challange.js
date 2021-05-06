@@ -14,18 +14,17 @@ const router = express.Router();
 // TODO GET Endpoint for getting a specific challange at /:id including optional ?feed parameter to populate feed (if this will be done as referance)
 // TODO PATCH Endpoint for updating properties of a specific challange at /:id
 // TODO PUT Endpoint for overriding a specific challange at /:id (maybe for v2)
-// TODO DELETE Endpoint for deleting a specific challange at /:id
+// TODO Find solution for DELETE Endpoint, as we can not simply delete a challange for all competitors
 
 /**
- * Finds one or more challanges associated to signed in user
- * (creator or competitor)
+ * Finds challanges associated to signed in user (creator or competitor)
  * Method: GET
  * @returns {Array<Object>} List of challanges
  */
 router.get('/', auth, async (request, response) => {
-  // TODO Return challange(s) including archived/past end date for signed in user with /?archived
+  // TODO Return challange(s) including archived for signed in user with /?archived (maybe for v2)
 
-  // get all active challanges associated to signed in user
+  // get all challanges associated to signed in user
   try {
     const challanges = await Challange.find({
       $or: [
