@@ -11,6 +11,7 @@ import ResetPasswordRequest from '../model/ResetPasswordRequest';
 
 // Define globals
 const router = express.Router();
+const mailer = sendmail();
 
 /**
  * Creates a new user.
@@ -72,7 +73,7 @@ router.post(
       const savedNewUser = await newUser.save();
       return response.json(savedNewUser);
     } catch (error) {
-      return response.json(error);
+      return response.status(400).json(error);
     }
   }
 );
@@ -156,11 +157,11 @@ router.post('/forgot', async (request, response) => {
 
   // Delete previous requests
   try {
-    await ResetPasswordRequest.deleteOne({
-      email: request.body.email,
+    await ResetPasswordRequest.deleteMany({
+      userId: user._id,
     });
   } catch (error) {
-    response.json([
+    response.status(400).json([
       {
         error: 'Failed to delete previous reset password request.',
       },
@@ -179,7 +180,7 @@ router.post('/forgot', async (request, response) => {
 
     // Send mail
     try {
-      sendmail({
+      mailer({
         from: process.env.SENDMAIL_FROM,
         to: request.body.email,
         subject: 'Reset password',
@@ -236,11 +237,7 @@ router.post('/reset', async (request, response) => {
   const hashedPassword = await bcrypt.hash(request.body.password, salt);
 
   try {
-    // Delete requests
-    await ResetPasswordRequest.deleteOne({
-      _id: resetPasswordRequest._id,
-    });
-
+    // Update user
     const updatedUser = await User.findOneAndUpdate(
       {
         _id: resetPasswordRequest.userId,
@@ -249,6 +246,11 @@ router.post('/reset', async (request, response) => {
         password: hashedPassword,
       }
     );
+
+    // Delete request
+    await ResetPasswordRequest.deleteOne({
+      _id: resetPasswordRequest._id,
+    });
 
     return response.json(updatedUser);
   } catch (error) {

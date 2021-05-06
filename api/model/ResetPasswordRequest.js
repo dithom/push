@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 const ResetPasswordRequestSchema = mongoose.Schema({
-  user: {
-    type: mongoose.ObjectId,
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
   resetId: {
