@@ -1,5 +1,4 @@
 import express from 'express';
-import _ from 'lodash';
 import { body, validationResult } from 'express-validator';
 
 // Import middleware
@@ -12,8 +11,10 @@ import Challange from '../model/Challange';
 const router = express.Router();
 
 // TODO Find solution for challange feeds. Separate collection or put it into challange?
-// TODO Endpoint for updating challange
-// TODO Endpoint for deleting challange
+// TODO GET Endpoint for getting a specific challange at /:id including optional ?feed parameter to populate feed (if this will be done as referance)
+// TODO PATCH Endpoint for updating properties of a specific challange at /:id
+// TODO PUT Endpoint for overriding a specific challange at /:id (maybe for v2)
+// TODO DELETE Endpoint for deleting a specific challange at /:id
 
 /**
  * Finds one or more challanges associated to signed in user
@@ -22,33 +23,25 @@ const router = express.Router();
  * @returns {Array<Object>} List of challanges
  */
 router.get('/', auth, async (request, response) => {
+  // TODO Return challange(s) including archived/past end date for signed in user with /?archived
+
   // get all active challanges associated to signed in user
-  if (_.isEmpty(request.params)) {
-    try {
-      const challanges = await Challange.find({
-        $or: [
-          {
-            creator: request.userId,
-          },
-          {
-            competitors: request.userId,
-          },
-        ],
-      });
+  try {
+    const challanges = await Challange.find({
+      $or: [
+        {
+          creator: request.userId,
+        },
+        {
+          competitors: request.userId,
+        },
+      ],
+    });
 
-      return response.json(challanges);
-    } catch (error) {
-      return response.status(400).json(error);
-    }
+    return response.json(challanges);
+  } catch (error) {
+    return response.status(400).json(error);
   }
-
-  // TODO Return a specific challange for signed in user with /?id
-  // TODO Return a specific challange including feed for signed in user with /?id&feed
-  // TODO Return challange(s) including archived for signed in user with /?archived
-  return response.status(400).json({
-    error:
-      'No sufficient parameters or parameters which can not be used in conjunction provided.',
-  });
 });
 
 /**
