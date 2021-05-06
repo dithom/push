@@ -1,4 +1,5 @@
 import express from 'express';
+import _ from 'lodash';
 import { body, validationResult } from 'express-validator';
 
 // Import middleware
@@ -11,25 +12,43 @@ import Challange from '../model/Challange';
 const router = express.Router();
 
 // TODO Find solution for challange feeds. Separate collection or put it into challange?
+// TODO Endpoint for updating challange
+// TODO Endpoint for deleting challange
 
 /**
- * Finds one or more challanges connected to signed in user
+ * Finds one or more challanges associated to signed in user
  * (creator or competitor)
  * Method: GET
  * @returns {Array<Object>} List of challanges
  */
-router.get('/', auth, (request, response) => {
-  // TODO Return running challanges for signed in user at /
-  // TODO Return a specific challange for signed in user with /?id
-  // TODO Return challange(s) including feed for signed in user with /?feed
-  // TODO Return challange(s) including archived for signed in user with /?archived
+router.get('/', auth, async (request, response) => {
+  // get all active challanges associated to signed in user
+  if (_.isEmpty(request.params)) {
+    try {
+      const challanges = await Challange.find({
+        $or: [
+          {
+            creator: request.userId,
+          },
+          {
+            competitors: request.userId,
+          },
+        ],
+      });
 
-  return response.json([
-    {
-      name: 'Dummy challange',
-      requestedFromUserId: request.userId,
-    },
-  ]);
+      return response.json(challanges);
+    } catch (error) {
+      return response.status(400).json(error);
+    }
+  }
+
+  // TODO Return a specific challange for signed in user with /?id
+  // TODO Return a specific challange including feed for signed in user with /?id&feed
+  // TODO Return challange(s) including archived for signed in user with /?archived
+  return response.status(400).json({
+    error:
+      'No sufficient parameters or parameters which can not be used in conjunction provided.',
+  });
 });
 
 /**
@@ -114,7 +133,7 @@ router.post(
       const savedChallange = await newChallange.save();
       return response.json(savedChallange);
     } catch (error) {
-      return response.json(error);
+      return response.status(400).json(error);
     }
   }
 );
