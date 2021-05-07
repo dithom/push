@@ -139,8 +139,18 @@ router.post(
  * @param  {string} email
  * @returns {Object} Success message
  */
-router.post('/forgot', async (request, response) => {
-  // TODO add validation
+router.post('/forgot', 
+body('email').isString().isEmail().isLength({ min: 6, max: 255 }),
+async (request, response) => {
+  // Find validation errors and wrap them in an object
+  const errors = validationResult(request);
+
+  if (!errors.isEmpty()) {
+    return response.status(400).json({
+      errors: errors.array(),
+    });
+  }
+
   if (!request.body.email) {
     return response.status(400).json({
       error: 'No sufficient data provided.',
@@ -216,8 +226,18 @@ router.post('/forgot', async (request, response) => {
  * @param {string} password
  * @returns {Object} Updated user
  */
-router.post('/reset', async (request, response) => {
-  // TODO add validation
+router.post('/reset', 
+body('resetId').isString(),
+body('password').isString().isLength({ min: 6, max: 255 }),
+async (request, response) => {
+  // Find validation errors and wrap them in an object
+  const errors = validationResult(request);
+
+  if (!errors.isEmpty()) {
+    return response.status(400).json({
+      errors: errors.array(),
+    });
+  }
   if (!request.body.password) {
     return response.status(400).json({
       error: 'No sufficient data provided.',
@@ -264,7 +284,7 @@ router.post('/reset', async (request, response) => {
 });
 
 /**
- * Set user mode to archived = true (DELETE)
+ * Set user mode to archived = true
  * Method: DELETE
  * @returns {Object} Updated user
  */
