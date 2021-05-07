@@ -23,6 +23,11 @@ const UserSchema = mongoose.Schema({
     min: 6,
     max: 255,
   },
+  archived: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model('User', UserSchema);
