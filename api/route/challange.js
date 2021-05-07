@@ -15,6 +15,7 @@ const router = express.Router();
 // TODO PATCH Endpoint for updating properties of a specific challange at /:id
 // TODO PUT Endpoint for overriding a specific challange at /:id (maybe for v2)
 // TODO Find solution for DELETE Endpoint, as we can not simply delete a challange for all competitors
+// TODO After Challange creation, each competitor has to accept the challange -> how is this messaged sent?
 
 /**
  * Finds challanges associated to signed in user (creator or competitor)
