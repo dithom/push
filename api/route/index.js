@@ -308,4 +308,7 @@ router.delete('/delete', auth, async (request, response) => {
   }
 });
 
+// TODO get highsocre
+
+
 module.exports = router;
