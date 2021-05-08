@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import idValidator from 'mongoose-id-validator';
 
-//Child Referencing: the parent references its children.
+// Child Referencing: the parent references its children.
 
 const ChallangeSchema = mongoose.Schema({
   name: {

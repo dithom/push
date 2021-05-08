@@ -17,6 +17,14 @@ const router = express.Router();
 const mailer = sendmail();
 
 /**
+ * Returns a authenticated response.
+ * Method: GET
+ */
+router.get('/auth', auth, (request, response) => {
+  return response.end();
+});
+
+/**
  * Creates a new user.
  * Method: POST
  * @param  {string} email
@@ -97,8 +105,67 @@ router.post(
     const errors = validationResult(request);
 
     if (!errors.isEmpty()) {
+      response.statusMessage = 'Error validating request body';
       return response.status(400).json({
         errors: errors.array(),
+      });
+    }
+
+    // Check user
+    const user = await User.findOne({
+      email: request.body.email,
+    });
+
+    if (!user) {
+      response.statusMessage = 'Email is not valid';
+      return response.status(400).json({
+        error: 'Email is not valid.',
+      });
+    }
+
+    const passwordIsValid = await bcrypt.compare(
+      request.body.password,
+      user.password
+    );
+
+    if (!passwordIsValid) {
+      response.statusMessage = 'Password is not valid';
+      return response.status(400).json({
+        error: 'Password is not valid.',
+      });
+    }
+
+    // Create and assign token
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+
+    return response.json({
+      authToken: token,
+    });
+  }
+);
+
+/**
+ * Creates a new reset password request and sends an email.
+ * Method: POST
+ * @param  {string} email
+ * @returns {Object} Success message
+ */
+router.post(
+  '/forgot',
+  body('email').isString().isEmail().isLength({ min: 6, max: 255 }),
+  async (request, response) => {
+    // Find validation errors and wrap them in an object
+    const errors = validationResult(request);
+
+    if (!errors.isEmpty()) {
+      return response.status(400).json({
+        errors: errors.array(),
+      });
+    }
+
+    if (!request.body.email) {
+      return response.status(400).json({
+        error: 'No sufficient data provided.',
       });
     }
 
@@ -113,111 +180,57 @@ router.post(
       });
     }
 
-    const passwordIsValid = await bcrypt.compare(
-      request.body.password,
-      user.password
-    );
-
-    if (!passwordIsValid) {
-      return response.status(400).json({
-        error: 'Password is not valid.',
+    // Delete previous requests
+    try {
+      await ResetPasswordRequest.deleteMany({
+        userId: user._id,
       });
+    } catch (error) {
+      response.status(400).json([
+        {
+          error: 'Failed to delete previous reset password request.',
+        },
+      ]);
     }
 
-    // Create and assign token
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-
-    return response.header('auth-token', token).json({
-      authToken: token,
-    });
-  }
-);
-
-/**
- * Creates a new reset password request and sends an email.
- * Method: POST
- * @param  {string} email
- * @returns {Object} Success message
- */
-router.post('/forgot', 
-body('email').isString().isEmail().isLength({ min: 6, max: 255 }),
-async (request, response) => {
-  // Find validation errors and wrap them in an object
-  const errors = validationResult(request);
-
-  if (!errors.isEmpty()) {
-    return response.status(400).json({
-      errors: errors.array(),
-    });
-  }
-
-  if (!request.body.email) {
-    return response.status(400).json({
-      error: 'No sufficient data provided.',
-    });
-  }
-
-  // Check user
-  const user = await User.findOne({
-    email: request.body.email,
-  });
-
-  if (!user) {
-    return response.status(400).json({
-      error: 'Email is not valid.',
-    });
-  }
-
-  // Delete previous requests
-  try {
-    await ResetPasswordRequest.deleteMany({
+    // Create new reset request
+    const resetId = uuidv4();
+    const newResetPasswordRequest = new ResetPasswordRequest({
       userId: user._id,
+      resetId,
     });
-  } catch (error) {
-    response.status(400).json([
-      {
-        error: 'Failed to delete previous reset password request.',
-      },
-    ]);
-  }
 
-  // Create new reset request
-  const resetId = uuidv4();
-  const newResetPasswordRequest = new ResetPasswordRequest({
-    userId: user._id,
-    resetId,
-  });
-
-  try {
-    const savedNewResetPasswordRequest = await newResetPasswordRequest.save();
-
-    // Send mail
     try {
-      mailer({
-        from: process.env.SENDMAIL_FROM,
-        to: request.body.email,
-        subject: 'Reset password',
-        html: `
+      const savedNewResetPasswordRequest = await newResetPasswordRequest.save();
+
+      // Send mail
+      try {
+        mailer({
+          from: process.env.SENDMAIL_FROM,
+          to: request.body.email,
+          subject: 'Reset password',
+          html: `
           Reset your password using this link:
           ${process.env.FRONTEND_URL}${process.env.FRONTEND_RESET_PASSWORD_PATH}/${resetId}
         `,
-      });
+        });
 
-      return response.json([
-        {
-          message: 'Mail has been sent.',
-        },
-        savedNewResetPasswordRequest,
-      ]);
+        return response.json([
+          {
+            message: 'Mail has been sent.',
+          },
+          savedNewResetPasswordRequest,
+        ]);
+      } catch (error) {
+        return response.status(400).json({
+          error: 'Failed to send mail.',
+        });
+      }
     } catch (error) {
-      return response.status(400).json({
-        error: 'Failed to send mail.',
-      });
+      return response.status(400).json(error);
     }
-  } catch (error) {
-    return response.status(400).json(error);
   }
-});
+);
 
 /**
  * Resets password for an existing reset password request.
@@ -226,62 +239,64 @@ async (request, response) => {
  * @param {string} password
  * @returns {Object} Updated user
  */
-router.post('/reset', 
-body('resetId').isString(),
-body('password').isString().isLength({ min: 6, max: 255 }),
-async (request, response) => {
-  // Find validation errors and wrap them in an object
-  const errors = validationResult(request);
+router.post(
+  '/reset',
+  body('resetId').isString(),
+  body('password').isString().isLength({ min: 6, max: 255 }),
+  async (request, response) => {
+    // Find validation errors and wrap them in an object
+    const errors = validationResult(request);
 
-  if (!errors.isEmpty()) {
-    return response.status(400).json({
-      errors: errors.array(),
+    if (!errors.isEmpty()) {
+      return response.status(400).json({
+        errors: errors.array(),
+      });
+    }
+    if (!request.body.password) {
+      return response.status(400).json({
+        error: 'No sufficient data provided.',
+      });
+    }
+
+    // Check reset requests
+    const resetPasswordRequest = await ResetPasswordRequest.findOne({
+      resetId: request.body.resetId,
     });
+
+    if (!resetPasswordRequest) {
+      return response.status(400).json({
+        error: 'Reset id is not valid.',
+      });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(request.body.password, salt);
+
+    try {
+      // Update user
+      const updatedUser = await User.findOneAndUpdate(
+        {
+          _id: resetPasswordRequest.userId,
+        },
+        {
+          password: hashedPassword,
+        }
+      );
+
+      // Delete request
+      await ResetPasswordRequest.deleteOne({
+        _id: resetPasswordRequest._id,
+      });
+
+      return response.json(updatedUser);
+    } catch (error) {
+      return response.status(400).json({
+        error: 'Failed to reset password.',
+      });
+    }
   }
-  if (!request.body.password) {
-    return response.status(400).json({
-      error: 'No sufficient data provided.',
-    });
-  }
-
-  // Check reset requests
-  const resetPasswordRequest = await ResetPasswordRequest.findOne({
-    resetId: request.body.resetId,
-  });
-
-  if (!resetPasswordRequest) {
-    return response.status(400).json({
-      error: 'Reset id is not valid.',
-    });
-  }
-
-  // Hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(request.body.password, salt);
-
-  try {
-    // Update user
-    const updatedUser = await User.findOneAndUpdate(
-      {
-        _id: resetPasswordRequest.userId,
-      },
-      {
-        password: hashedPassword,
-      }
-    );
-
-    // Delete request
-    await ResetPasswordRequest.deleteOne({
-      _id: resetPasswordRequest._id,
-    });
-
-    return response.json(updatedUser);
-  } catch (error) {
-    return response.status(400).json({
-      error: 'Failed to reset password.',
-    });
-  }
-});
+);
 
 /**
  * Set user mode to archived = true
@@ -300,7 +315,6 @@ router.delete('/delete', auth, async (request, response) => {
       }
     );
     return response.json(updatedUser);
-
   } catch (error) {
     return response.status(400).json({
       error: 'Failed to delete User.',
@@ -309,6 +323,5 @@ router.delete('/delete', auth, async (request, response) => {
 });
 
 // TODO get highsocre
-
 
 module.exports = router;

@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import mongoose from 'mongoose';
 
 // Import routes
@@ -14,6 +15,7 @@ dotenv.config();
 
 // Middleware
 app.use(express.json());
+app.use(cors());
 
 // Routes
 app.use('/api/v1', indexRoute);
