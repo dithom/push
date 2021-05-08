@@ -1,0 +1,24 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "parserOptions": {
+    "parser": "babel-eslint"
+  },
+  "extends": [
+    "@nuxtjs",
+    "plugin:prettier/recommended",
+    "plugin:nuxt/recommended"
+  ],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allow": ["_id"]
+      }
+    ]
+  }
+}
