@@ -136,6 +136,14 @@ router.post(
     }
 
     // TODO check if user is archived (deleted)
+    /*
+    if (user.archived == 'true') {
+      response.statusMessage = 'User does not exist';
+      return response.status(400).json({
+        error: 'User does not exist',
+      });
+    }
+    */
 
     // Create and assign token
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
