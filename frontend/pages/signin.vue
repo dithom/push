@@ -111,7 +111,15 @@ export default {
 
         this.error = true;
       } catch (error) {
-        this.wrongCredentials = true;
+        if (
+          error.response &&
+          error.response.status &&
+          error.response.status === 400
+        ) {
+          this.wrongCredentials = true;
+        } else {
+          this.error = true;
+        }
       }
 
       this.loading = false;

@@ -19,7 +19,6 @@ export default async ({ store, $axios, redirect }) => {
       });
 
       store.commit('session/init', cookieToken);
-
       return;
     } catch (error) {
       return redirect('/signin');

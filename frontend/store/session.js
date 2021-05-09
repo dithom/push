@@ -14,11 +14,12 @@ export const mutations = {
   init(state, authToken) {
     state.authToken = authToken;
     state.authenticated = true;
-    cookie.set('session', authToken);
+    cookie.set('session', authToken, { expires: 90 });
   },
   destroy() {
     state.authToken = null;
     state.authenticated = false;
-    cookie.set('session');
+    cookie.remove('session');
+    this.$router.push('/signin');
   },
 };
