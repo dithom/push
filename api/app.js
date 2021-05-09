@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 // Import routes
 import indexRoute from './route/index';
 import challangeRoute from './route/challange';
-
+import userRoute from './route/user';
 // App
 const app = express();
 
@@ -19,8 +19,8 @@ app.use(cors());
 
 // Routes
 app.use('/api/v1', indexRoute);
-// TODO User route
 app.use('/api/v1/challange', challangeRoute);
+app.use('/api/v1/user', userRoute);
 
 // Database
 mongoose.connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`, {

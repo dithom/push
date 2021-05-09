@@ -298,30 +298,4 @@ router.post(
   }
 );
 
-/**
- * Set user mode to archived = true
- * Method: DELETE
- * @returns {Object} Updated user
- */
-
-router.delete('/delete', auth, async (request, response) => {
-  // Check if ID matches one in the users table and change archived to true
-  try {
-    // Update user
-    const updatedUser = await User.findByIdAndUpdate(
-      { _id: request.userId },
-      {
-        archived: true,
-      }
-    );
-    return response.json(updatedUser);
-  } catch (error) {
-    return response.status(400).json({
-      error: 'Failed to delete User.',
-    });
-  }
-});
-
-// TODO get highsocre
-
 module.exports = router;
