@@ -135,6 +135,8 @@ router.post(
       });
     }
 
+    // TODO check if user is archived (deleted)
+
     // Create and assign token
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
