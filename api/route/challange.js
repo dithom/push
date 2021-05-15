@@ -25,6 +25,9 @@ const router = express.Router();
 router.get('/active', auth, async (request, response) => {
   // TODO Return challange(s) including archived for signed in user with /?archived (maybe for v2)
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   // get all challanges associated to signed in user
   try {
     const challanges = await Challange.find({
@@ -36,6 +39,7 @@ router.get('/active', auth, async (request, response) => {
           competitors: request.userId,
         },
       ],
+      $and: [{ endDate: { $gte: today } }],
     });
 
     return response.json(challanges);
@@ -52,6 +56,9 @@ router.get('/active', auth, async (request, response) => {
 router.get('/archived', auth, async (request, response) => {
   // TODO Return challange(s) including archived for signed in user with /?archived (maybe for v2)
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   // get all challanges associated to signed in user
   try {
     const challanges = await Challange.find({
@@ -63,6 +70,7 @@ router.get('/archived', auth, async (request, response) => {
           competitors: request.userId,
         },
       ],
+      $and: [{ endDate: { $lt: today } }],
     });
 
     return response.json(challanges);
