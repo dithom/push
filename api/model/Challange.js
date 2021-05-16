@@ -18,7 +18,7 @@ const ChallangeSchema = mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['sports'],
+    enum: ['sports', 'art', 'reading'],
     required: true,
   },
   startDate: {

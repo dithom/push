@@ -18,12 +18,15 @@ const router = express.Router();
 // TODO After Challange creation, each competitor has to accept the challange -> how is this messaged sent?
 
 /**
- * Finds challanges associated to signed in user (creator or competitor)
+ * Finds active challanges associated to signed in user (creator or competitor)
  * Method: GET
  * @returns {Array<Object>} List of challanges
  */
-router.get('/', auth, async (request, response) => {
+router.get('/active', auth, async (request, response) => {
   // TODO Return challange(s) including archived for signed in user with /?archived (maybe for v2)
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   // get all challanges associated to signed in user
   try {
@@ -36,6 +39,38 @@ router.get('/', auth, async (request, response) => {
           competitors: request.userId,
         },
       ],
+      $and: [{ endDate: { $gte: today } }],
+    });
+
+    return response.json(challanges);
+  } catch (error) {
+    return response.status(400).json(error);
+  }
+});
+
+/**
+ * Finds archived challanges associated to signed in user (creator or competitor)
+ * Method: GET
+ * @returns {Array<Object>} List of challanges
+ */
+router.get('/archived', auth, async (request, response) => {
+  // TODO Return challange(s) including archived for signed in user with /?archived (maybe for v2)
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // get all challanges associated to signed in user
+  try {
+    const challanges = await Challange.find({
+      $or: [
+        {
+          creator: request.userId,
+        },
+        {
+          competitors: request.userId,
+        },
+      ],
+      $and: [{ endDate: { $lt: today } }],
     });
 
     return response.json(challanges);
@@ -65,7 +100,7 @@ router.post(
   body('name').isString().isLength({ min: 6, max: 255 }),
   body('description').isString().isLength({ min: 6, max: 1023 }),
   body('category').isString(),
-  body('startDate').isDate(),
+  body('startDate').isDate(), // yyyy-mm-dd
   body('endDate').isDate(),
   body('repetitions').isNumeric(),
   body('frequency').isInt(),
@@ -86,7 +121,13 @@ router.post(
     const startDate = new Date(request.body.startDate);
     const endDate = new Date(request.body.endDate);
 
-    if (startDate < new Date()) {
+    let today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const yyyy = today.getFullYear();
+    today = new Date(`${yyyy}-${mm}-${dd}`);
+
+    if (startDate < today) {
       return response.status(400).json({
         error: 'The start date can not be set to earlier than today.',
       });

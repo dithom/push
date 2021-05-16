@@ -53,4 +53,33 @@ router.get('/highscore', auth, async (request, response) => {
   }
 });
 
+/**
+ * Get Challenge Leaderbord (Top-10)
+ * Method: GET
+ * @returns {Array<Object>} List of highscore and user in descending order
+ */
+router.get('/leaderboard', auth, async (request, response) => {
+  try {
+    const Users = await User.find();
+    const highscoreList = [];
+
+    // get only the username and his/her score
+    console.log(Users.length);
+    for (let i = 0; i < Users.length; i++) {
+      const item = Users[i];
+      const userScore = { username: item.username, highscore: item.highscore };
+      highscoreList.push(userScore);
+    }
+
+    // sort by highscore in descending order
+    highscoreList.sort(
+      (a, b) => parseFloat(b.highscore) - parseFloat(a.highscore)
+    );
+
+    return response.json(highscoreList);
+  } catch (error) {
+    return response.status(400).json(error);
+  }
+});
+
 module.exports = router;
