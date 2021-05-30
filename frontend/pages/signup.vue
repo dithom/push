@@ -116,7 +116,7 @@ export default {
         });
         if (response.email) {
           console.log('Successfully created user');
-          this.$router.push('/signin');
+          this.$router.push('/userCreated');
           return;
         }
 
