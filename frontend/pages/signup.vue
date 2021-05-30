@@ -10,7 +10,7 @@ Form for registering user
       <div class="col-10 col-md-8 col-lg-6 col-xl-4">
         <h1 class="text-center">Sign up</h1>
         <div v-if="wrongCredentials || error" class="alert alert-danger">
-          <span v-if="wrongCredentials">Email address or password wrong.</span>
+          <span v-if="wrongCredentials">Email or username already exists</span>
           <span v-if="error"
             >Sorry, there seems to be an issue on our side. Please try again
             later.</span
@@ -99,25 +99,24 @@ export default {
       const form = event.target;
 
       if (form.checkValidity()) {
-        this.getToken();
+        this.createUser();
       }
-
       this.formValidated = true;
     },
-    async getToken() {
+    async createUser() {
       this.loading = true;
       this.wrongCredentials = false;
       this.error = false;
 
       try {
-        const response = await this.$axios.$post('/signin', {
+        const response = await this.$axios.$post('/signup', {
           email: this.email,
           password: this.password,
+          username: this.username,
         });
-
-        if (response.authToken) {
-          this.$store.commit('session/init', response.authToken);
-          this.$router.push('/dashboard');
+        if (response.email) {
+          console.log('Successfully created user');
+          this.$router.push('/signin');
           return;
         }
 
