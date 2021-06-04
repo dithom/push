@@ -103,8 +103,12 @@ export default {
           password: this.password,
         });
 
+        const payload = {
+          authToken: response.authToken,
+          userid: response.userid,
+        };
         if (response.authToken) {
-          this.$store.commit('session/init', response.authToken);
+          this.$store.commit('session/init', payload);
           this.$router.push('/dashboard');
           return;
         }

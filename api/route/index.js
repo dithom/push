@@ -135,7 +135,6 @@ router.post(
       });
     }
 
-    console.log(user.archived);
     if (user.archived) {
       response.statusMessage = 'User does not exist';
       return response.status(400).json({
@@ -148,6 +147,7 @@ router.post(
 
     return response.json({
       authToken: token,
+      userid: user._id,
     });
   }
 );

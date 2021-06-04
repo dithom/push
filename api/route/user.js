@@ -54,6 +54,27 @@ router.get('/highscore', auth, async (request, response) => {
 });
 
 /**
+ * Get username of specific user
+ * Method: GET
+ * @returns {String} username
+ */
+
+router.get('/username', auth, async (request, response) => {
+  // Check if ID matches one in the users table and change archived to true
+  // get all challanges associated to signed in user
+  try {
+    // Check if user email already exists
+    const user = await User.findOne({
+      _id: request.userId,
+    });
+
+    return response.json({ username: user.username });
+  } catch (error) {
+    return response.status(400).json(error);
+  }
+});
+
+/**
  * Get Challenge Leaderbord (Top-10)
  * Method: GET
  * @returns {Array<Object>} List of highscore and user in descending order
