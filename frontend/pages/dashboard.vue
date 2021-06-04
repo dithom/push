@@ -22,10 +22,10 @@ Initial page for signed in user. Shows general overview.
       Create new Challenge
     </button>
 
-    <p v-if="$fetchState.pending">Fetching mountains...</p>
+    <p v-if="$fetchState.pending">Fetching Challanges</p>
     <p v-else-if="$fetchState.error">An error occurred :(</p>
     <div v-else>
-      <h1>Active activeChallanges</h1>
+      <h1>Active Challanges</h1>
       <div v-for="(item, index) in activeChallanges" :key="item.username">
         {{ index }}. {{ item.name }}. {{ item.repetitions }} left, today
       </div>
@@ -46,7 +46,7 @@ export default {
   // get Data from API
   async fetch() {
     // Username
-    const responseUsername = await this.$axios.$get('/user/username', {
+    const responseUsername = await this.$axios.$get('/user/userinformation', {
       headers: { 'auth-token': this.$store.state.session.authToken },
     });
     this.$store.commit('session/setUserName', responseUsername.username);
@@ -62,11 +62,6 @@ export default {
         headers: { 'auth-token': this.$store.state.session.authToken },
       }
     );
-    for (let i = 0; i < responseActiveChallanges.length; i++) {
-      console.log(responseActiveChallanges[i]);
-      // elements[i].style.color = "red";
-    }
-
     this.activeChallanges = responseActiveChallanges;
   },
   // get Userscore

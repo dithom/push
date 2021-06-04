@@ -59,7 +59,7 @@ router.get('/highscore', auth, async (request, response) => {
  * @returns {String} username
  */
 
-router.get('/username', auth, async (request, response) => {
+router.get('/userinformation', auth, async (request, response) => {
   // Check if ID matches one in the users table and change archived to true
   // get all challanges associated to signed in user
   try {
@@ -68,7 +68,7 @@ router.get('/username', auth, async (request, response) => {
       _id: request.userId,
     });
 
-    return response.json({ username: user.username });
+    return response.json(user);
   } catch (error) {
     return response.status(400).json(error);
   }
