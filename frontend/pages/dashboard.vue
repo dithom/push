@@ -6,9 +6,22 @@ Initial page for signed in user. Shows general overview.
 
 <template>
   <div class="container">
-    Dashboard
     <div>Hi {{ userName }} !</div>
+    <div>Your current score is {{ userName }} !</div>
     <button class="btn btn-primary" @click="onClickLogout">Logout</button>
+
+    <button class="btn btn-primary" @click="onClickProfile">Profile</button>
+
+    <button class="btn btn-primary" @click="onClickLeaderboard">
+      Leaderboard
+    </button>
+
+    <button class="btn btn-primary" @click="onClickArchive">Archive</button>
+
+    <button class="btn btn-primary" @click="onClickCreateChallenge">
+      Create new Challenge
+    </button>
+
     <p v-if="$fetchState.pending">Fetching mountains...</p>
     <p v-else-if="$fetchState.error">An error occurred :(</p>
     <div v-else>
@@ -44,6 +57,22 @@ export default {
   methods: {
     onClickLogout() {
       this.$store.commit('session/destroy');
+    },
+
+    onClickProfile() {
+      this.$router.push('/profile');
+    },
+
+    onClickLeaderboard() {
+      this.$router.push('/leaderboard');
+    },
+
+    onClickArchive() {
+      this.$router.push('/archive');
+    },
+
+    onClickCreateChallenge() {
+      this.$router.push('/createChallange');
     },
   },
 };
