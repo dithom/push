@@ -7,7 +7,7 @@ Initial page for signed in user. Shows general overview.
 <template>
   <div class="container">
     <div>Hi {{ userName }} !</div>
-    <div>Your current score is {{ userName }} !</div>
+    <div>Your current score is {{ score }} !</div>
     <button class="btn btn-primary" @click="onClickLogout">Logout</button>
 
     <button class="btn btn-primary" @click="onClickProfile">Profile</button>
@@ -25,9 +25,9 @@ Initial page for signed in user. Shows general overview.
     <p v-if="$fetchState.pending">Fetching mountains...</p>
     <p v-else-if="$fetchState.error">An error occurred :(</p>
     <div v-else>
-      <h1>Nuxt Mountains</h1>
-      <div v-for="(item, index) in mountains" :key="item.username">
-        {{ index }}. {{ item.name }}
+      <h1>Active activeChallanges</h1>
+      <div v-for="(item, index) in activeChallanges" :key="item.username">
+        {{ index }}. {{ item.name }}. {{ item.repetitions }} left, today
       </div>
     </div>
   </div>
@@ -38,16 +38,45 @@ export default {
   middleware: ['auth'],
   data() {
     return {
-      mountains: [],
+      activeChallanges: [],
+      score: 0,
     };
   },
 
+  // get Data from API
   async fetch() {
-    const response = await this.$axios.$get('/user/username', {
+    // Username
+    const responseUsername = await this.$axios.$get('/user/username', {
       headers: { 'auth-token': this.$store.state.session.authToken },
     });
-    this.$store.commit('session/setUserName', response.username);
+    this.$store.commit('session/setUserName', responseUsername.username);
+    // UserScore
+    const responseUserScore = await this.$axios.$get('/user/highscore', {
+      headers: { 'auth-token': this.$store.state.session.authToken },
+    });
+    this.score = responseUserScore.highscore;
+    // active Challanges
+    const responseActiveChallanges = await this.$axios.$get(
+      '/challange/active',
+      {
+        headers: { 'auth-token': this.$store.state.session.authToken },
+      }
+    );
+    for (let i = 0; i < responseActiveChallanges.length; i++) {
+      console.log(responseActiveChallanges[i]);
+      // elements[i].style.color = "red";
+    }
+
+    this.activeChallanges = responseActiveChallanges;
   },
+  // get Userscore
+  /*
+  async getUserscore() {
+    this.score = await this.$axios.$get('/user/highscore', {
+      headers: { 'auth-token': this.$store.state.session.authToken },
+    });
+  },
+  */
 
   computed: {
     userName() {
