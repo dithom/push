@@ -22,12 +22,13 @@ Lets user create a challange
       >
         <div class="input-group has-validation mb-3">
           <input
-            v-model="challangeName"
+            v-model="name"
             class="form-control"
-            name="challangeName"
+            name="name"
             type="name"
             placeholder="Challange Name"
             minlength="6"
+            maxlength="255"
             :disabled="loading"
             required
           />
@@ -40,38 +41,50 @@ Lets user create a challange
             name="description"
             type="description"
             placeholder="Challange Description"
+            minlength="6"
+            maxlength="1023"
             :disabled="loading"
             required
           />
           <div class="invalid-feedback">Please enter a description.</div>
         </div>
         <div class="input-group has-validation mb-3">
-          <label for="cars">Choose a Category: </label>
-          <select id="cars" name="cars">
+          <label for="category">Choose a Category: </label>
+          <select id="category" v-model="category" name="category">
             <option value="sport">Sport</option>
             <option value="music">Music</option>
-            <option value="literature">Literature</option>
-            <option value="gaming">Gaming</option>
+            <option value="reading">Reading</option>
+            <option value="art">Art</option>
           </select>
         </div>
         <div class="input-group has-validation mb-3">
           <input
-            v-model="duration"
+            v-model="startDate"
             class="form-control"
-            name="duration"
-            type="duration"
-            placeholder="Duration (in days)"
+            name="startDate"
+            type="date"
+            placeholder=""
             :disabled="loading"
             required
           />
-          <div class="invalid-feedback">Please enter a duration</div>
+          <div class="invalid-feedback">Please enter a start Date</div>
+          <input
+            v-model="endDate"
+            class="form-control"
+            name="endDate"
+            type="date"
+            placeholder=""
+            :disabled="loading"
+            required
+          />
+          <div class="invalid-feedback">Please enter an end date</div>
         </div>
         <div class="input-group has-validation mb-3">
           <div>
             <input
-              v-model="repition"
+              v-model="repititions"
               class="form-control"
-              name="repition"
+              name="repetitions"
               type="repition"
               placeholder="Repitions"
               :disabled="loading"
@@ -80,9 +93,11 @@ Lets user create a challange
           </div>
           <div>times per</div>
           <div>
-            <select id="cars" name="cars">
+            <select id="cars" v-model="timespan" name="cars">
+              <option value="minute">Minute</option>
+              <option value="hour">Hour</option>
               <option value="day">Day</option>
-              <option value="month">Week</option>
+              <option value="week">Week</option>
               <option value="month">Month</option>
             </select>
           </div>
@@ -92,6 +107,7 @@ Lets user create a challange
           <p>Visibility:</p>
           <input
             id="public"
+            v-model="visibility"
             type="radio"
             name="visibility"
             value="public"
@@ -115,24 +131,85 @@ Lets user create a challange
 
 <script>
 export default {
+  // TODO show current Date as starting Date
+
   middleware: ['auth'],
   data() {
     return {
-      challangeName: '',
+      name: '',
       description: '',
       category: '',
-      duration: '',
+      startDate: '',
+      endDate: '',
+      repititions: '',
+      frequency: '',
+      timespan: '',
+      competitors: [],
       interval: false,
       visibility: true,
+
+      formValidated: false,
+      loading: false,
+      wrongCredentials: false,
+      error: false,
     };
   },
   methods: {
     onFormSubmit(event) {
-      this.$router.push('/createChallangeAttendees');
+      event.preventDefault();
+      event.stopPropagation();
+
+      const form = event.target;
+
+      if (form.checkValidity()) {
+        this.createChallange();
+      }
+      this.formValidated = true;
     },
-    onClickBack() {
-      this.$router.push('/dashboard');
+    async createChallange() {
+      this.loading = true;
+      this.wrongCredentials = false;
+      this.error = false;
+      try {
+        const response = await this.$axios.$post(
+          '/challange/create',
+          {
+            name: this.name,
+            description: this.description,
+            category: this.category,
+            startDate: '2021-08-21',
+            endDate: '2021-08-23',
+            repetitions: this.repititions,
+            timespan: this.timespan,
+            visibility: this.visibility,
+            competitors: this.competitors,
+          },
+
+          { headers: { 'auth-token': this.$store.state.session.authToken } }
+        );
+
+        if (response.name) {
+          console.log('Successfully created challange');
+          this.$router.push('/createChallangeAttendees');
+          return;
+        }
+        this.error = true;
+      } catch (error) {
+        if (
+          error.response &&
+          error.response.status &&
+          error.response.status === 400
+        ) {
+          this.wrongCredentials = true;
+        } else {
+          this.error = true;
+        }
+      }
+      this.loading = false;
     },
+  },
+  onClickBack() {
+    this.$router.push('/dashboard');
   },
 };
 </script>

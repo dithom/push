@@ -88,7 +88,6 @@ router.get('/archived', auth, async (request, response) => {
  * @param  {Date} startDate
  * @param  {Date} endDate
  * @param  {number} repetitions
- * @param  {number} frequency
  * @param  {string} timespan
  * @param  {string} visibility
  * @param {Array<string>} [competitors]
@@ -102,8 +101,7 @@ router.post(
   body('category').isString(),
   body('startDate').isDate(), // yyyy-mm-dd
   body('endDate').isDate(),
-  body('repetitions').isNumeric(),
-  body('frequency').isInt(),
+  body('repetitions').isInt(),
   body('timespan').isString(),
   body('visibility').isString(),
   body('competitors').isArray(),
@@ -112,11 +110,11 @@ router.post(
     const errors = validationResult(request);
 
     if (!errors.isEmpty()) {
+      console.log(errors);
       return response.status(400).json({
         errors: errors.array(),
       });
     }
-
     // Check dates
     const startDate = new Date(request.body.startDate);
     const endDate = new Date(request.body.endDate);
@@ -156,7 +154,6 @@ router.post(
       startDate: request.body.startDate,
       endDate: request.body.endDate,
       repetitions: request.body.repetitions,
-      frequency: request.body.frequency,
       timespan: request.body.timespan,
       creator: request.userId,
       visibility: request.body.visibility,
@@ -165,8 +162,10 @@ router.post(
 
     try {
       const savedChallange = await newChallange.save();
+      console.log(savedChallange);
       return response.json(savedChallange);
     } catch (error) {
+      console.log(error);
       return response.status(400).json(error);
     }
   }

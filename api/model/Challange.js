@@ -18,7 +18,7 @@ const ChallangeSchema = mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['sports', 'art', 'reading'],
+    enum: ['sport', 'art', 'reading', 'music'],
     required: true,
   },
   startDate: {
@@ -30,10 +30,6 @@ const ChallangeSchema = mongoose.Schema({
     required: true,
   },
   repetitions: {
-    type: Number,
-    required: true,
-  },
-  frequency: {
     type: Number,
     required: true,
   },
