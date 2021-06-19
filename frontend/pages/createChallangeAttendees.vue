@@ -11,23 +11,25 @@ Lets user add competitors to his challange
         <h1 class="text-center">Create Challange</h1>
       </div>
       <div class="col-10 col-md-8 col-lg-6 col-xl-4">
+        <h3 class="text-center">Deine Challange wurde erfolgreich erstellt</h3>
+      </div>
+      <div class="col-10 col-md-8 col-lg-6 col-xl-4">
         <h3 class="text-center">
           Do you want to add competitors to your challange?
         </h3>
       </div>
       <div class="input-group has-validation mb-3">
-        <div class="wrap">
-          <div class="search">
-            <input
-              type="text"
-              class="searchTerm"
-              placeholder="Search for other competitors"
-            />
-            <button type="submit" class="searchButton">
-              <i class="fa fa-search"></i>
-            </button>
-          </div>
-        </div>
+        <input
+          v-model.trim="search"
+          type="text"
+          placeholder="Search people..."
+          @keyup="getAllStarWarsPeople"
+        /><br />
+        <ul>
+          <li v-for="person in people" :key="person.id">
+            {{ person.name }}
+          </li>
+        </ul>
       </div>
       <button
         class="btn btn-primary w-100 mb-3"
