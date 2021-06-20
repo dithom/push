@@ -26,7 +26,7 @@ Lets user add competitors to his challange
         />
         <div>{{ noSearchEntryMessage }}</div>
         <button class="btn btn-primary w-100 mb-3" @click="onClickSearchButton">
-          Search attendees
+          Search attendee
         </button>
         <div>{{ noUserFound }}</div>
         <div v-for="(item, index) in competitors" :key="item.username">
