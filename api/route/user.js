@@ -54,9 +54,9 @@ router.get('/highscore', auth, async (request, response) => {
 });
 
 /**
- * Get username of specific user
+ * Get username of specific user by id
  * Method: GET
- * @returns {String} username
+ * @returns <json> user
  */
 
 router.get('/userinformation', auth, async (request, response) => {
@@ -85,7 +85,6 @@ router.get('/leaderboard', auth, async (request, response) => {
     const highscoreList = [];
 
     // get only the username and his/her score
-    console.log(Users.length);
     for (let i = 0; i < Users.length; i++) {
       const item = Users[i];
       const userScore = { username: item.username, highscore: item.highscore };
@@ -98,6 +97,26 @@ router.get('/leaderboard', auth, async (request, response) => {
     );
 
     return response.json(highscoreList);
+  } catch (error) {
+    return response.status(400).json(error);
+  }
+});
+
+/**
+ * Get userinformation by email or mail
+ * Method: GET
+ * @returns <json> user
+ */
+
+router.post('/getAttendee', auth, async (request, response) => {
+  // Check if ID matches one in the users table and change archived to true
+  // get all challanges associated to signed in user
+  try {
+    // Check if user email already exists
+    const user = await User.findOne({
+      username: request.body.username,
+    });
+    return response.json(user);
   } catch (error) {
     return response.status(400).json(error);
   }
