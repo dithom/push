@@ -111,6 +111,8 @@ router.get('/leaderboard', auth, async (request, response) => {
  * @returns {Object} user
  */
 
+// TODO Add Body validation
+
 router.post('/getAttendee', auth, async (request, response) => {
   try {
     // Check if user email already exists

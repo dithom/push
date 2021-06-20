@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 
 // Import middleware
 import auth from '../middleware/auth';
-
+import User from '../model/User';
 // Import models
 import Challange from '../model/Challange';
 
@@ -167,5 +167,31 @@ router.post(
     }
   }
 );
+
+/**
+ * Update Challange with attendees
+ * Method: PATCH
+ * @returns {Object} Created challange
+ */
+router.patch('/addattendees', auth, async (request, response) => {
+  const competitorsNames = request.body.competitors;
+  const competitorIds = [];
+  for (let i = 0; i < competitorsNames.length; i++) {
+    console.log('username', competitorsNames[i].username);
+    const user = await User.findOne({
+      username: competitorsNames[i].username,
+    });
+    competitorIds.push(user._id);
+  }
+  // find and update challange by name
+  const filter = { name: request.body.name };
+  const update = { competitors: competitorIds };
+  try {
+    const challanges = await Challange.findOneAndUpdate(filter, update);
+    return response.json(challanges);
+  } catch (error) {
+    return response.status(400).json(error);
+  }
+});
 
 module.exports = router;

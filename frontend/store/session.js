@@ -10,6 +10,7 @@ export const state = () => ({
   userid: null,
   authenticated: false,
   username: null,
+  createdChallangeName: '',
 });
 
 export const mutations = {
@@ -21,6 +22,9 @@ export const mutations = {
   },
   setUserName(state, username) {
     state.username = username;
+  },
+  setCreatedChallange(state, challangeName) {
+    state.createdChallangeName = challangeName;
   },
   destroy() {
     state.authToken = null;

@@ -24,6 +24,7 @@ Lets user add competitors to his challange
           type="text"
           placeholder="Search for attendees"
         />
+        <div>{{ noSearchEntryMessage }}</div>
         <button class="btn btn-primary w-100 mb-3" @click="onClickSearchButton">
           Search attendees
         </button>
@@ -33,7 +34,11 @@ Lets user add competitors to his challange
           {{ item.highscore }}
         </div>
       </div>
-      <button class="btn btn-primary w-100 mb-3" type="submit">
+      <button
+        class="btn btn-primary w-100 mb-3"
+        type="submit"
+        @click="onClickAddAttendees"
+      >
         {{ addAttendeeButtonText }}
       </button>
     </div>
@@ -47,6 +52,7 @@ export default {
     return {
       search: '',
       competitors: [],
+      noSearchEntryMessage: '',
       noUserFound: '',
       addAttendeeButtonText: 'Create without attendees',
     };
@@ -56,13 +62,18 @@ export default {
       this.$router.push('/dashboard');
     },
     onClickSearchButton() {
-      this.getAttendee();
-      this.noUserFound = '';
+      if (this.search) {
+        this.getAttendee();
+        this.noUserFound = '';
+        this.noSearchEntryMessage = '';
+      } else {
+        this.noSearchEntryMessage = 'Bitte gib einen Username ein';
+      }
+
       // get Data from API
     },
     async getAttendee() {
       try {
-        console.log('this.search', this.search);
         const responseAttendee = await this.$axios.$post(
           '/user/getAttendee',
           {
@@ -74,15 +85,40 @@ export default {
         );
         this.competitors.push(responseAttendee);
         this.changeAddAttendeeButtonText();
+        console.log(
+          'his.$store.state.session',
+          this.$store.state.session.createdChallangeName
+        );
       } catch (error) {
         this.noUserFound = 'Sorry, userName with this credentials not found';
       }
     },
     changeAddAttendeeButtonText() {
       const amountCompetitors = this.competitors.length;
-
       this.addAttendeeButtonText =
         'Add ' + amountCompetitors + ' users to created challange';
+    },
+    onClickAddAttendees() {
+      this.getAttendee();
+      this.noUserFound = '';
+      this.addAttendee();
+    },
+    async addAttendee() {
+      try {
+        await this.$axios.$patch(
+          '/challange/addattendees',
+          {
+            competitors: this.competitors,
+            name: this.$store.state.session.createdChallangeName,
+          },
+          {
+            headers: { 'auth-token': this.$store.state.session.authToken },
+          }
+        );
+        this.$router.push('/dashboard');
+      } catch (error) {
+        this.noUserFound = 'Sorry, userName with this credentials not found';
+      }
     },
   },
 };

@@ -50,12 +50,18 @@ Lets user create a challange
         </div>
         <div class="input-group has-validation mb-3">
           <label for="category">Choose a Category: </label>
-          <select id="category" v-model="category" name="category">
+          <select
+            id="category"
+            v-model="category"
+            name="category"
+            required="required"
+          >
             <option value="sport">Sport</option>
             <option value="music">Music</option>
             <option value="reading">Reading</option>
             <option value="art">Art</option>
           </select>
+          <div class="invalid-feedback">Please choose a category</div>
         </div>
         <div class="input-group has-validation mb-3">
           <input
@@ -85,7 +91,8 @@ Lets user create a challange
               v-model="repititions"
               class="form-control"
               name="repetitions"
-              type="repition"
+              type="number"
+              min="1"
               placeholder="Repitions"
               :disabled="loading"
               required
@@ -93,13 +100,19 @@ Lets user create a challange
           </div>
           <div>times per</div>
           <div>
-            <select id="cars" v-model="timespan" name="cars">
+            <select
+              id="cars"
+              v-model="timespan"
+              name="timespan"
+              required="required"
+            >
               <option value="minute">Minute</option>
               <option value="hour">Hour</option>
               <option value="day">Day</option>
               <option value="week">Week</option>
               <option value="month">Month</option>
             </select>
+            <div class="invalid-feedback">Please choose a timespan</div>
           </div>
           <div class="invalid-feedback">Please enter a duration</div>
         </div>
@@ -112,10 +125,12 @@ Lets user create a challange
             name="visibility"
             value="public"
             checked="checked"
+            required
           />
           <label for="public">Public</label>
           <input id="private" type="radio" name="visibility" value="private" />
           <label for="private">Private</label>
+          <div class="invalid-feedback">Please choose a visibility</div>
         </div>
         <button
           class="btn btn-primary w-100 mb-3"
@@ -190,6 +205,7 @@ export default {
 
         if (response.name) {
           console.log('Successfully created challange');
+          this.$store.commit('session/setCreatedChallange', response.name);
           this.$router.push('/createChallangeAttendees');
           return;
         }
