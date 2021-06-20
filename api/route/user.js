@@ -112,13 +112,8 @@ router.get('/leaderboard', auth, async (request, response) => {
  */
 
 router.post('/getAttendee', auth, async (request, response) => {
-  console.log('Moin');
   try {
     // Check if user email already exists
-
-    console.log('get attendee');
-    console.log('request.body.username', request.body);
-    console.log('request.body.username', request.body.username);
     const user = await User.findOne({
       username: request.body.username,
     });
