@@ -20,23 +20,21 @@ Lets user add competitors to his challange
       </div>
       <div class="input-group has-validation mb-3">
         <input
-          v-model.trim="search"
+          v-model="search"
           type="text"
-          placeholder="Search people..."
-          @keyup="getAllStarWarsPeople"
-        /><br />
-        <ul>
-          <li v-for="person in people" :key="person.id">
-            {{ person.name }}
-          </li>
-        </ul>
+          placeholder="Search for attendees"
+        />
+        <button class="btn btn-primary w-100 mb-3" @click="onClickSearchButton">
+          Search attendees
+        </button>
+        <div>{{ noUserFound }}</div>
+        <div v-for="(item, index) in competitors" :key="item.username">
+          {{ index }}. Username: {{ item.username }}. Highscore:
+          {{ item.highscore }}
+        </div>
       </div>
-      <button
-        class="btn btn-primary w-100 mb-3"
-        type="submit"
-        :disabled="loading"
-      >
-        Next
+      <button class="btn btn-primary w-100 mb-3" type="submit">
+        {{ addAttendeeButtonText }}
       </button>
     </div>
   </div>
@@ -47,17 +45,44 @@ export default {
   middleware: ['auth'],
   data() {
     return {
-      challangeName: '',
-      description: '',
-      category: '',
-      duration: '',
-      interval: false,
-      visibility: true,
+      search: '',
+      competitors: [],
+      noUserFound: '',
+      addAttendeeButtonText: 'Create without attendees',
     };
   },
   methods: {
     onClickBack() {
       this.$router.push('/dashboard');
+    },
+    onClickSearchButton() {
+      this.getAttendee();
+      this.noUserFound = '';
+      // get Data from API
+    },
+    async getAttendee() {
+      try {
+        console.log('this.search', this.search);
+        const responseAttendee = await this.$axios.$post(
+          '/user/getAttendee',
+          {
+            username: this.search,
+          },
+          {
+            headers: { 'auth-token': this.$store.state.session.authToken },
+          }
+        );
+        this.competitors.push(responseAttendee);
+        this.changeAddAttendeeButtonText();
+      } catch (error) {
+        this.noUserFound = 'Sorry, userName with this credentials not found';
+      }
+    },
+    changeAddAttendeeButtonText() {
+      const amountCompetitors = this.competitors.length;
+
+      this.addAttendeeButtonText =
+        'Add ' + amountCompetitors + ' users to created challange';
     },
   },
 };

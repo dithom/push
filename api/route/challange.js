@@ -110,7 +110,6 @@ router.post(
     const errors = validationResult(request);
 
     if (!errors.isEmpty()) {
-      console.log(errors);
       return response.status(400).json({
         errors: errors.array(),
       });
@@ -162,10 +161,8 @@ router.post(
 
     try {
       const savedChallange = await newChallange.save();
-      console.log(savedChallange);
       return response.json(savedChallange);
     } catch (error) {
-      console.log(error);
       return response.status(400).json(error);
     }
   }

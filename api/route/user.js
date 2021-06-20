@@ -56,7 +56,7 @@ router.get('/highscore', auth, async (request, response) => {
 /**
  * Get username of specific user by id
  * Method: GET
- * @returns <json> user
+ * @returns {Object}  user
  */
 
 router.get('/userinformation', auth, async (request, response) => {
@@ -102,17 +102,23 @@ router.get('/leaderboard', auth, async (request, response) => {
   }
 });
 
+// TODO check if user is archived or not
+// TODO check if not own username
+
 /**
  * Get userinformation by email or mail
  * Method: GET
- * @returns <json> user
+ * @returns {Object} user
  */
 
 router.post('/getAttendee', auth, async (request, response) => {
-  // Check if ID matches one in the users table and change archived to true
-  // get all challanges associated to signed in user
+  console.log('Moin');
   try {
     // Check if user email already exists
+
+    console.log('get attendee');
+    console.log('request.body.username', request.body);
+    console.log('request.body.username', request.body.username);
     const user = await User.findOne({
       username: request.body.username,
     });
