@@ -61,6 +61,9 @@ export default {
     onClickBack() {
       this.$router.push('/dashboard');
     },
+
+    // TODO own name should not be searchable
+
     onClickSearchButton() {
       if (this.search) {
         this.getAttendee();

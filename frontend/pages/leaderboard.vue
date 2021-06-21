@@ -29,6 +29,8 @@ export default {
     };
   },
 
+  // TODO show attendees with current score in specific challange
+
   // get Data from API
   async fetch() {
     // Username

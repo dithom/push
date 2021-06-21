@@ -194,4 +194,22 @@ router.patch('/addattendees', auth, async (request, response) => {
   }
 });
 
+/**
+ * Get Information of specific Challange (id)
+ * Method: GET
+ * @returns {Object} Challange
+ */
+router.get('/:id', auth, async (request, response) => {
+  try {
+    // Get Challange
+    const challange = await Challange.findOne({
+      _id: request.params.id,
+    });
+
+    return response.json(challange);
+  } catch (error) {
+    return response.status(400).json(error);
+  }
+});
+
 module.exports = router;

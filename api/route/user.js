@@ -54,6 +54,25 @@ router.get('/highscore', auth, async (request, response) => {
 });
 
 /**
+ * Get Information of specific Challange (id)
+ * Method: GET
+ * @returns {Object} Challange
+ */
+router.get('/userinformation/:id', auth, async (request, response) => {
+  try {
+    // Get Challange
+    const user = await User.findOne({
+      _id: request.params.id,
+    });
+
+    return response.json(user);
+  } catch (error) {
+    return response.status(400).json(error);
+  }
+});
+
+// TODO redundant -> kann weg
+/**
  * Get username of specific user by id
  * Method: GET
  * @returns {Object}  user

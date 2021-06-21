@@ -26,9 +26,14 @@ Initial page for signed in user. Shows general overview.
     <p v-else-if="$fetchState.error">An error occurred :(</p>
     <div v-else>
       <h1>Active Challanges</h1>
+      <p v-for="item in activeChallanges" :key="item.username">
+        <NuxtLink :to="'/challange/' + item._id">{{ item.name }}</NuxtLink>
+      </p>
+      <!--
       <div v-for="(item, index) in activeChallanges" :key="item.username">
         {{ index }}. {{ item.name }}. {{ item.repetitions }} left, today
       </div>
+      -->
     </div>
   </div>
 </template>
@@ -46,6 +51,7 @@ export default {
   // get Data from API
   async fetch() {
     // Username
+
     const responseUsername = await this.$axios.$get('/user/userinformation', {
       headers: { 'auth-token': this.$store.state.session.authToken },
     });
