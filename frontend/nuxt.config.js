@@ -47,7 +47,25 @@ export default {
   },
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: ['@nuxtjs/dotenv', '@nuxtjs/axios'],
+  modules: ['@nuxtjs/dotenv', '@nuxtjs/axios', 'nuxt-socket-io'],
+  io: {
+    sockets: [
+      // Required
+      {
+        // At least one entry is required
+        name: 'home',
+        url: process.env.SOCKET_IO_URL,
+        default: true,
+        vuex: {
+          /* see section below */
+        },
+        namespaces: {
+          /* see section below */
+        },
+      },
+      { name: 'challangeFeed', url: 'http://localhost:3000' },
+    ],
+  },
 
   // Axios
   axios: {

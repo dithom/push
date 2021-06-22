@@ -5,7 +5,6 @@ import User from '../model/User';
 
 const auth = async (request, response, next) => {
   const token = request.header('auth-token');
-  console.log(token);
   if (!token) {
     return response.status(401).json({
       error: 'Access denied',

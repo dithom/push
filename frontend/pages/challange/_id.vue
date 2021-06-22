@@ -53,7 +53,20 @@ export default {
     }
     this.calculateRemainingTime(this.challange.endDate);
   },
+  mounted() {
+    this.socket = this.$nuxtSocket({
+      name: 'home',
+      vuex: {
+        // overrides the vuex opts in the nuxt.config
+      },
+    });
+  },
   methods: {
+    getMessage() {
+      this.socket.emit('getMessage', { id: 'abc123' }, (resp) => {
+        this.messageRxd = resp;
+      });
+    },
     onClickBack() {
       this.$router.push('/dashboard');
     },
