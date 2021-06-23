@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import http from 'http';
+import formatMessage from './utils/messagesService';
 
 // Import routes
 import indexRoute from './route/index';
@@ -19,31 +20,30 @@ const server = http.createServer(app);
 const io = socketio(server, {
   cors: { origin: '*' },
 });
+const botName = 'admin';
 
-app.get('/', function (req, res) {
-  res.sendfile('index.html');
-});
 // event listeners
 io.on('connection', (socket) => {
-  // if client from the frontend connects
-  console.log('a user connected');
+  socket.on('joinRoom', (username) => {
+    // socket -> sends to the user who is connecting -> single client
+    socket.emit('message', formatMessage(botName, 'Welcome to the challange'));
 
-  // socket -> sends to the user who is connecting -> single client
-  socket.emit('message', 'Welcome to the challange');
-
-  // Broadcast  -> sends to everybody but the user who is connecting
-  socket.broadcast.emit('message', 'A User has joined the feed');
-
-  // Runs when client disconnects
-  socket.on('disconnect', () => {
-    io.emit('message', 'A User has left the chat'); // io -> sends to all clients
+    // Broadcast  -> sends to everybody but the user who is connecting
+    socket.broadcast.emit(
+      'message',
+      formatMessage(botName, 'A User has joined the feed')
+    );
   });
 
   // Listen for chatMessage from user
   socket.on('chatMessage', (msg) => {
     // send message to every client
-    io.emit('message', msg);
-    console.log(msg);
+    io.emit('message', formatMessage('USER', msg));
+  });
+
+  // Runs when client disconnects
+  socket.on('disconnect', () => {
+    io.emit('message', formatMessage(botName, 'A User has left the chat')); // io -> sends to all clients
   });
 });
 /*

@@ -31,22 +31,7 @@ Shows Profile Information of User
             <li>Mike</li>
           </ul>
         </div>
-        <div class="chat-messages">
-          <div class="message">
-            <p class="meta">Brad <span>9:12pm</span></p>
-            <p class="text">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi,
-              repudiandae.
-            </p>
-          </div>
-          <div class="message">
-            <p class="meta">Mary <span>9:15pm</span></p>
-            <p class="text">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi,
-              repudiandae.
-            </p>
-          </div>
-        </div>
+        <div class="chat-messages"></div>
       </main>
       <div class="chat-form-container">
         <form id="chat-form" @submit="onFormSubmit">
@@ -107,6 +92,9 @@ export default {
     this.socket = this.$nuxtSocket({
       name: 'home',
     });
+    // Join Chatroom
+    this.socket.emit('joinRoom', this.$store.state.session.username);
+
     /* Listen for events on socket: */
     this.socket.on('message', (msg, cb) => {
       console.log(msg);
@@ -140,9 +128,9 @@ export default {
       // create message div
       const div = document.createElement('div');
       div.classList.add('message');
-      div.innerHTML = `<p class="meta">Brad <span>9:12pm</span></p>
+      div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
             <p class="text">
-              ${message}
+              ${message.text}
             </p>`;
       // add new div (message) to div chat messages
       document.querySelector('.chat-messages').appendChild(div);
