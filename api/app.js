@@ -27,15 +27,23 @@ app.get('/', function (req, res) {
 io.on('connection', (socket) => {
   // if client from the frontend connects
   console.log('a user connected');
-  // Whenever someone disconnects this piece of code executed
-  socket.on('disconnect', function () {
-    console.log('A user disconnected');
+
+  // socket -> sends to the user who is connecting -> single client
+  socket.emit('message', 'Welcome to the challange');
+
+  // Broadcast  -> sends to everybody but the user who is connecting
+  socket.broadcast.emit('message', 'A User has joined the feed');
+
+  // Runs when client disconnects
+  socket.on('disconnect', () => {
+    io.emit('message', 'A User has left the chat'); // io -> sends to all clients
   });
-  socket.on('message', (message) => {
-    // listen on custom events on the socket object
-    console.log(message);
-    // remit the message -> for all clients
-    io.emit('message', `${socket.id.substr(0, 2)} said ${message}`);
+
+  // Listen for chatMessage from user
+  socket.on('chatMessage', (msg) => {
+    // send message to every client
+    io.emit('message', msg);
+    console.log(msg);
   });
 });
 /*

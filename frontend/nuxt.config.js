@@ -56,14 +56,7 @@ export default {
         name: 'home',
         url: process.env.SOCKET_IO_URL,
         default: true,
-        vuex: {
-          /* see section below */
-        },
-        namespaces: {
-          /* see section below */
-        },
       },
-      { name: 'challangeFeed', url: 'http://localhost:3000' },
     ],
   },
 
