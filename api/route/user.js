@@ -71,7 +71,6 @@ router.get('/userinformation/:id', auth, async (request, response) => {
   }
 });
 
-// TODO redundant -> kann weg
 /**
  * Get username of specific user by id
  * Method: GET

@@ -68,8 +68,8 @@ export default {
   // get Data from API
   async fetch() {
     // get challange information from API
-    const routeURl = '/challange/' + this.$route.params.id;
-    const response = await this.$axios.$get(routeURl, {
+    let routeURl = '/challange/' + this.$route.params.id;
+    let response = await this.$axios.$get(routeURl, {
       headers: { 'auth-token': this.$store.state.session.authToken },
     });
     this.challange = response;
@@ -87,6 +87,23 @@ export default {
         this.attendees.push(response.username);
       }
     }
+    // get challangeFeed from API
+    routeURl = '/challangeFeed/' + this.$route.params.id;
+    response = await this.$axios.$get(routeURl, {
+      headers: { 'auth-token': this.$store.state.session.authToken },
+    });
+    console.log('ilst of messages', response);
+
+    // create div of past chatmessages
+    for (let i = 0; i < response.length; i++) {
+      const message = {
+        username: response[i].user,
+        time: response[i].date,
+        text: response[i].message,
+      };
+      this.outputMessage(message);
+    }
+
     this.calculateRemainingTime(this.challange.endDate);
   },
   mounted() {

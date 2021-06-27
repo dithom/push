@@ -5,37 +5,24 @@ import { body, validationResult } from 'express-validator';
 import auth from '../middleware/auth';
 import User from '../model/User';
 // Import models
-import Challange from '../model/Challange';
+import ChallangeFeed from '../model/ChallangeFeed';
 
 // Define globals
 const router = express.Router();
 
 /**
  * post new feed item to challangefeed collection
- * Method: POST
- * @returns {Object} Created feed
+ * Method: GET
+ * @returns {Array<Object>} Created feed
  */
-router.post('/challangeFeed', auth, async (request, response) => {
-  // TODO Return challange(s) including archived for signed in user with /?archived (maybe for v2)
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // get all challanges associated to signed in user
+router.get('/:id', auth, async (request, response) => {
   try {
-    const challanges = await Challange.find({
-      $or: [
-        {
-          creator: request.userId,
-        },
-        {
-          competitors: request.userId,
-        },
-      ],
-      $and: [{ endDate: { $gte: today } }],
+    // Get Challange
+    const challangeFeed = await ChallangeFeed.find({
+      challange: request.params.id,
     });
 
-    return response.json(challanges);
+    return response.json(challangeFeed);
   } catch (error) {
     return response.status(400).json(error);
   }

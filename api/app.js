@@ -70,11 +70,7 @@ io.on('connection', (socket) => {
     io.emit('message', formatMessage(botName, 'A User has left the chat')); // io -> sends to all clients
   });
 });
-/*
-http.listen(process.env.SERVER_PORT, function () {
-  console.log('listening on *:3000');
-});
-*/
+
 // dotenv
 dotenv.config();
 
@@ -85,7 +81,7 @@ app.use(cors());
 // Routes
 app.use('/api/v1', indexRoute);
 app.use('/api/v1/challange', challangeRoute);
-app.use('/api/v1/challange', challangeFeedRoute);
+app.use('/api/v1/challangeFeed', challangeFeedRoute);
 app.use('/api/v1/user', userRoute);
 
 // Database
