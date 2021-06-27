@@ -53,6 +53,7 @@ Shows Profile Information of User
 </template>
 
 <script>
+import formatMessage from '../../utils/messageFormatService';
 export default {
   middleware: ['auth'],
   data() {
@@ -114,10 +115,20 @@ export default {
       event.stopPropagation();
 
       // get message text from chat form
-      const msg = event.target.elements.msg.value;
+      const messageText = event.target.elements.msg.value;
+
+      // Create Json for message
 
       // Send Chat Message to server
-      this.socket.emit('chatMessage', msg);
+      this.socket.emit(
+        'chatMessage',
+        formatMessage(
+          'message',
+          messageText,
+          this.$store.state.session.userid,
+          this.$route.params.id
+        )
+      );
 
       // clear input
       event.target.elements.msg.value = '';

@@ -8,7 +8,12 @@ import formatMessage from './utils/messagesService';
 // Import routes
 import indexRoute from './route/index';
 import challangeRoute from './route/challange';
+import challangeFeedRoute from './route/challangeFeed';
 import userRoute from './route/user';
+
+// Import models
+import ChallangeFeed from './model/ChallangeFeed';
+import User from './model/User';
 
 const socketio = require('socket.io');
 
@@ -37,8 +42,27 @@ io.on('connection', (socket) => {
 
   // Listen for chatMessage from user
   socket.on('chatMessage', (msg) => {
-    // send message to every client
-    io.emit('message', formatMessage('USER', msg));
+    // save msg to database
+    const currentDate = new Date();
+    const chatMessage = new ChallangeFeed({
+      type: msg.type,
+      message: msg.text,
+      date: currentDate,
+      user: msg.userId,
+      challange: msg.challangeId,
+    });
+    chatMessage.save();
+    // find username by id
+    User.findOne({
+      _id: msg.userId,
+    })
+      .then((user) => {
+        // send message to every client
+        io.emit('message', formatMessage(user.username, msg.text));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 
   // Runs when client disconnects
@@ -61,6 +85,7 @@ app.use(cors());
 // Routes
 app.use('/api/v1', indexRoute);
 app.use('/api/v1/challange', challangeRoute);
+app.use('/api/v1/challange', challangeFeedRoute);
 app.use('/api/v1/user', userRoute);
 
 // Database
