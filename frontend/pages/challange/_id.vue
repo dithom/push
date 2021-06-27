@@ -96,8 +96,13 @@ export default {
 
     // create div of past chatmessages
     for (let i = 0; i < response.length; i++) {
+      routeURl = 'user/userinformation/' + response[i].user;
+      const user = await this.$axios.$get(routeURl, {
+        headers: { 'auth-token': this.$store.state.session.authToken },
+      });
       const message = {
-        username: response[i].user,
+        // get challangeFeed from API
+        username: user.username,
         time: response[i].date,
         text: response[i].message,
       };
