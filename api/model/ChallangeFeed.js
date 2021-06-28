@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import idValidator from 'mongoose-id-validator';
 
 // Child Referencing: the parent references its children.
-
+// TODO anderes Schema überlegen, bei einer logActivity braucht es keine message
 const ChallangeFeedSchema = mongoose.Schema({
   type: {
     type: String,
@@ -11,8 +11,8 @@ const ChallangeFeedSchema = mongoose.Schema({
   },
   message: {
     type: String,
-    required: true,
-    min: 6,
+    required: false,
+    min: 0,
     max: 1023,
   },
   date: {

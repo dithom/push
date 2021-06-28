@@ -16,8 +16,13 @@ Shows Profile Information of User
     </div>
     <div>Creator: {{ creator }}</div>
     <div>{{ amountOfCompetitors }} Competitors:</div>
-    <div v-for="(item, index) in attendees" :key="item">
-      {{ index + 1 }}. : {{ item }} - Accomplished Repetitions:
+    <div>
+      <div v-for="(item, index) in attendees" :key="item">
+        {{ index + 1 }}. : {{ item }} -
+      </div>
+      <div v-for="(item, index) in userTotalRepetitionsMap" :key="item">
+        {{ index }} - Total Repetitions: {{ item }}
+      </div>
     </div>
     <div class="chat-container">
       <header class="chat-header">
@@ -59,6 +64,7 @@ export default {
       attendees: [],
       creator: '',
       remainingDays: 0,
+      userTotalRepetitionsMap: {},
     };
   },
 
@@ -96,12 +102,16 @@ export default {
       headers: { 'auth-token': this.$store.state.session.authToken },
     });
 
-    // create div of past chatmessages
+    // create div of past chatmessages and activity logs and display them
+
+    const userIdMap = {};
+
     for (let i = 0; i < response.length; i++) {
       routeURl = 'user/userinformation/' + response[i].user;
       const user = await this.$axios.$get(routeURl, {
         headers: { 'auth-token': this.$store.state.session.authToken },
       });
+      userIdMap[user.username] = response[i].user;
       const message = {
         // get challangeFeed from API
         username: user.username,
@@ -110,6 +120,23 @@ export default {
       };
       this.outputMessage(message);
     }
+
+    const UserAccomplishedChallangesMap = {};
+    // extract logged activities per competitor with idUserMap
+    for (const [key, value] of Object.entries(userIdMap)) {
+      let amountOfAccomplishedChallanges = 0;
+      for (let i = 0; i < response.length; i++) {
+        if (
+          response[i].type === 'accomplishedActivity' &&
+          response[i].user === value
+        ) {
+          amountOfAccomplishedChallanges++;
+        }
+        UserAccomplishedChallangesMap[key] = amountOfAccomplishedChallanges;
+      }
+    }
+    this.userTotalRepetitionsMap = UserAccomplishedChallangesMap;
+    console.log('UserAccomplishedChallangesMap', UserAccomplishedChallangesMap);
 
     this.calculateRemainingTime(this.challange.endDate);
   },
@@ -180,7 +207,7 @@ export default {
         'logMessage',
         formatMessage(
           'accomplishedActivity',
-          '',
+          'accomplishedActivity',
           this.$store.state.session.userid,
           this.$route.params.id
         )

@@ -27,4 +27,22 @@ router.get('/:id', auth, async (request, response) => {
   }
 });
 
+/**
+ * post new feed item to challangefeed collection
+ * Method: GET
+ * @returns {Array<Object>} Created feed
+ */
+router.get('/:id', auth, async (request, response) => {
+  try {
+    // Get Challange
+    const challangeFeed = await ChallangeFeed.find({
+      challange: request.params.id,
+    });
+
+    return response.json(challangeFeed);
+  } catch (error) {
+    return response.status(400).json(error);
+  }
+});
+
 module.exports = router;
