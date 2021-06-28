@@ -7,7 +7,7 @@ const ChallangeFeedSchema = mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['message', 'accomplishedActivity', 'day', 'week', 'month'],
+    enum: ['message', 'accomplishedActivity'],
   },
   message: {
     type: String,

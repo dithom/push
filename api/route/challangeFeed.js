@@ -3,7 +3,6 @@ import { body, validationResult } from 'express-validator';
 
 // Import middleware
 import auth from '../middleware/auth';
-import User from '../model/User';
 // Import models
 import ChallangeFeed from '../model/ChallangeFeed';
 

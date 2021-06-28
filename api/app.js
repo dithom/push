@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
     );
   });
 
-  // Listen for chatMessage from user
+  // Listen for chatMessage and logActivity from user
   socket.on('chatMessage', (msg) => {
     // save msg to database
     const currentDate = new Date();
@@ -57,8 +57,37 @@ io.on('connection', (socket) => {
       _id: msg.userId,
     })
       .then((user) => {
-        // send message to every client
+        // send chat message to every client
         io.emit('message', formatMessage(user.username, msg.text));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
+
+  // Listen for chatMessage and logActivity from user
+  socket.on('logMessage', (msg) => {
+    console.log('activity logged');
+    // save msg to database
+    const currentDate = new Date();
+    const chatMessage = new ChallangeFeed({
+      type: msg.type,
+      message: msg.text,
+      date: currentDate,
+      user: msg.userId,
+      challange: msg.challangeId,
+    });
+    chatMessage.save();
+    // find username by id
+    User.findOne({
+      _id: msg.userId,
+    })
+      .then((user) => {
+        // send chat message to every client
+        io.emit(
+          'message',
+          formatMessage(user.username, 'has performed a repeat ')
+        );
       })
       .catch((err) => {
         console.log(err);
