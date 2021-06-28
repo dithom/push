@@ -212,6 +212,12 @@ export default {
           this.$route.params.id
         )
       );
+
+      // increase amount of Repetitions of user in UI
+
+      this.userTotalRepetitionsMap[this.$store.state.session.username] =
+        this.userTotalRepetitionsMap[this.$store.state.session.username] + 1;
+
       console.log('activity logged');
     },
     onClickBack() {
