@@ -38,6 +38,7 @@ export default {
       headers: { 'auth-token': this.$store.state.session.authToken },
     });
     this.leaderboard = responseLeaderboard;
+    console.log(this.leaderboard);
   },
   methods: {
     onClickBack() {

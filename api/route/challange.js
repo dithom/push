@@ -3,10 +3,15 @@ import { body, validationResult } from 'express-validator';
 
 // Import middleware
 import auth from '../middleware/auth';
-import User from '../model/User';
 // Import models
 import Challange from '../model/Challange';
 
+// Import Db Functions
+import challangedb from '../database/challangedb';
+
+// Import Service Functions
+import formatDateService from '../services/formatDateService';
+import userService from '../services/userService';
 // Define globals
 const router = express.Router();
 
@@ -23,29 +28,13 @@ const router = express.Router();
  * @returns {Array<Object>} List of challanges
  */
 router.get('/active', auth, async (request, response) => {
-  // TODO Return challange(s) including archived for signed in user with /?archived (maybe for v2)
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // get all challanges associated to signed in user
-  try {
-    const challanges = await Challange.find({
-      $or: [
-        {
-          creator: request.userId,
-        },
-        {
-          competitors: request.userId,
-        },
-      ],
-      $and: [{ endDate: { $gte: today } }],
-    });
-
+  const challanges = await challangedb.getActiveChallangesOfUser(
+    request.userId
+  );
+  if (challanges !== null) {
     return response.json(challanges);
-  } catch (error) {
-    return response.status(400).json(error);
   }
+  return response.status(400).json(challanges);
 });
 
 /**
@@ -54,29 +43,13 @@ router.get('/active', auth, async (request, response) => {
  * @returns {Array<Object>} List of challanges
  */
 router.get('/archived', auth, async (request, response) => {
-  // TODO Return challange(s) including archived for signed in user with /?archived (maybe for v2)
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // get all challanges associated to signed in user
-  try {
-    const challanges = await Challange.find({
-      $or: [
-        {
-          creator: request.userId,
-        },
-        {
-          competitors: request.userId,
-        },
-      ],
-      $and: [{ endDate: { $lt: today } }],
-    });
-
+  const challanges = await challangedb.getArchivedChallangesOfUser(
+    request.userId
+  );
+  if (challanges !== null) {
     return response.json(challanges);
-  } catch (error) {
-    return response.status(400).json(error);
   }
+  return response.status(400).json(challanges);
 });
 
 /**
@@ -115,14 +88,13 @@ router.post(
       });
     }
     // Check dates
-    const startDate = new Date(request.body.startDate);
-    const endDate = new Date(request.body.endDate);
-
-    let today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
-    const yyyy = today.getFullYear();
-    today = new Date(`${yyyy}-${mm}-${dd}`);
+    const dateArray = formatDateService.formatDate(
+      request.body.startDate,
+      request.body.endDate
+    );
+    const startDate = dateArray[0];
+    const endDate = dateArray[1];
+    const today = dateArray[2];
 
     if (startDate < today) {
       return response.status(400).json({
@@ -146,25 +118,11 @@ router.post(
     }
 
     // Create new challange
-    const newChallange = new Challange({
-      name: request.body.name,
-      description: request.body.description,
-      category: request.body.category,
-      startDate: request.body.startDate,
-      endDate: request.body.endDate,
-      repetitions: request.body.repetitions,
-      timespan: request.body.timespan,
-      creator: request.userId,
-      visibility: request.body.visibility,
-      competitors: request.body.competitors,
-    });
-
-    try {
-      const savedChallange = await newChallange.save();
+    const savedChallange = await challangedb.createNewChallange(request);
+    if (savedChallange !== null) {
       return response.json(savedChallange);
-    } catch (error) {
-      return response.status(400).json(error);
     }
+    return response.status(400).json(savedChallange);
   }
 );
 
@@ -174,15 +132,7 @@ router.post(
  * @returns {Object} Created challange
  */
 router.patch('/addattendees', auth, async (request, response) => {
-  const competitorsNames = request.body.competitors;
-  const competitorIds = [];
-  for (let i = 0; i < competitorsNames.length; i++) {
-    console.log('username', competitorsNames[i].username);
-    const user = await User.findOne({
-      username: competitorsNames[i].username,
-    });
-    competitorIds.push(user._id);
-  }
+  const competitorIds = userService.mapUsernamesToIds(request.body.competitors);
   // find and update challange by name
   const filter = { name: request.body.name };
   const update = { competitors: competitorIds };
@@ -200,16 +150,12 @@ router.patch('/addattendees', auth, async (request, response) => {
  * @returns {Object} Challange
  */
 router.get('/:id', auth, async (request, response) => {
-  try {
-    // Get Challange
-    const challange = await Challange.findOne({
-      _id: request.params.id,
-    });
-
+  // Check if ID matches one in the users table and change archived to true
+  const challange = await challangedb.getChallangeById(request.params.id);
+  if (challange !== null) {
     return response.json(challange);
-  } catch (error) {
-    return response.status(400).json(error);
   }
+  return response.status(400).json(challange);
 });
 
 module.exports = router;

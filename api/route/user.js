@@ -1,9 +1,12 @@
 import express from 'express';
-// Import models
-import User from '../model/User';
-
 // Import middleware
 import auth from '../middleware/auth';
+
+// Import Db Functions
+import userdb from '../database/userdb';
+
+// Import Service Functions
+import leaderboardService from '../services/leaderboardService';
 
 // Define globals
 const router = express.Router();
@@ -16,20 +19,13 @@ const router = express.Router();
 
 router.delete('/delete', auth, async (request, response) => {
   // Check if ID matches one in the users table and change archived to true
-  try {
-    // Update user
-    const updatedUser = await User.findByIdAndUpdate(
-      { _id: request.userId },
-      {
-        archived: true,
-      }
-    );
-    return response.json(updatedUser);
-  } catch (error) {
-    return response.status(400).json({
-      error: 'Failed to delete User.',
-    });
+  const user = await userdb.findByIdAndArchive(request.userId);
+  if (user !== null) {
+    return response.json(user);
   }
+  return response.status(400).json({
+    error: 'Failed to delete User.',
+  });
 });
 
 /**
@@ -40,35 +36,25 @@ router.delete('/delete', auth, async (request, response) => {
 
 router.get('/highscore', auth, async (request, response) => {
   // Check if ID matches one in the users table and change archived to true
-  // get all challanges associated to signed in user
-  try {
-    // Check if user email already exists
-    const user = await User.findOne({
-      _id: request.userId,
-    });
-
+  const user = await userdb.getUserById(request.userId);
+  if (user !== null) {
     return response.json({ highscore: user.highscore });
-  } catch (error) {
-    return response.status(400).json(error);
   }
+  return response.status(400).json(user);
 });
 
 /**
- * Get Information of specific Challange (id)
+ * Get Information of user(id)
  * Method: GET
  * @returns {Object} Challange
  */
 router.get('/userinformation/:id', auth, async (request, response) => {
-  try {
-    // Get Challange
-    const user = await User.findOne({
-      _id: request.params.id,
-    });
-
+  // Check if ID matches one in the users table and change archived to true
+  const user = await userdb.getUserById(request.userId);
+  if (user !== null) {
     return response.json(user);
-  } catch (error) {
-    return response.status(400).json(error);
   }
+  return response.status(400).json(user);
 });
 
 /**
@@ -79,17 +65,11 @@ router.get('/userinformation/:id', auth, async (request, response) => {
 
 router.get('/userinformation', auth, async (request, response) => {
   // Check if ID matches one in the users table and change archived to true
-  // get all challanges associated to signed in user
-  try {
-    // Check if user email already exists
-    const user = await User.findOne({
-      _id: request.userId,
-    });
-
+  const user = await userdb.getUserById(request.userId);
+  if (user !== null) {
     return response.json(user);
-  } catch (error) {
-    return response.status(400).json(error);
   }
+  return response.status(400).json(user);
 });
 
 /**
@@ -98,26 +78,12 @@ router.get('/userinformation', auth, async (request, response) => {
  * @returns {Array<Object>} List of highscore and user in descending order
  */
 router.get('/leaderboard', auth, async (request, response) => {
-  try {
-    const Users = await User.find();
-    const highscoreList = [];
-
-    // get only the username and his/her score
-    for (let i = 0; i < Users.length; i++) {
-      const item = Users[i];
-      const userScore = { username: item.username, highscore: item.highscore };
-      highscoreList.push(userScore);
-    }
-
-    // sort by highscore in descending order
-    highscoreList.sort(
-      (a, b) => parseFloat(b.highscore) - parseFloat(a.highscore)
-    );
-
-    return response.json(highscoreList);
-  } catch (error) {
-    return response.status(400).json(error);
+  const allUsers = await userdb.getAllUsers(request.body.userId);
+  if (allUsers !== 'error') {
+    const leaderboard = leaderboardService.createLeaderboard(allUsers);
+    return response.json(leaderboard);
   }
+  return response.status(400).json('leaderboard not found');
 });
 
 // TODO check if user is archived or not
@@ -132,15 +98,12 @@ router.get('/leaderboard', auth, async (request, response) => {
 // TODO Add Body validation
 
 router.post('/getAttendee', auth, async (request, response) => {
-  try {
-    // Check if user email already exists
-    const user = await User.findOne({
-      username: request.body.username,
-    });
+  // Check if ID matches one in the users table and change archived to true
+  const user = await userdb.getUserByName(request.body.username);
+  if (user !== null) {
     return response.json(user);
-  } catch (error) {
-    return response.status(400).json(error);
   }
+  return response.status(400).json(user);
 });
 
 module.exports = router;

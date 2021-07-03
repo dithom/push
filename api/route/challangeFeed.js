@@ -3,46 +3,27 @@ import { body, validationResult } from 'express-validator';
 
 // Import middleware
 import auth from '../middleware/auth';
-// Import models
-import ChallangeFeed from '../model/ChallangeFeed';
+
+// Import Db Functions
+import challangeFeeddb from '../database/challangeFeeddb';
 
 // Define globals
 const router = express.Router();
 
 /**
- * post new feed item to challangefeed collection
+ * Get Challange Feed from specific challange by id
  * Method: GET
  * @returns {Array<Object>} Created feed
  */
 router.get('/:id', auth, async (request, response) => {
-  try {
-    // Get Challange
-    const challangeFeed = await ChallangeFeed.find({
-      challange: request.params.id,
-    });
-
+  const challangeFeed = await challangeFeeddb.getChallangeFeedById(
+    request.params.id
+  );
+  console.log(challangeFeed);
+  if (challangeFeed !== null) {
     return response.json(challangeFeed);
-  } catch (error) {
-    return response.status(400).json(error);
   }
-});
-
-/**
- * post new feed item to challangefeed collection
- * Method: GET
- * @returns {Array<Object>} Created feed
- */
-router.get('/:id', auth, async (request, response) => {
-  try {
-    // Get Challange
-    const challangeFeed = await ChallangeFeed.find({
-      challange: request.params.id,
-    });
-
-    return response.json(challangeFeed);
-  } catch (error) {
-    return response.status(400).json(error);
-  }
+  return response.status(400).json(challangeFeed);
 });
 
 module.exports = router;
