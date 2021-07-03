@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import http from 'http';
-import formatMessage from './utils/messagesService';
 
 // Import routes
 import indexRoute from './route/index';
@@ -11,9 +10,8 @@ import challangeRoute from './route/challange';
 import challangeFeedRoute from './route/challangeFeed';
 import userRoute from './route/user';
 
-// Import models
-import ChallangeFeed from './model/ChallangeFeed';
-import User from './model/User';
+// Import socket services
+import socketService from './services/socketService';
 
 const socketio = require('socket.io');
 
@@ -25,80 +23,9 @@ const server = http.createServer(app);
 const io = socketio(server, {
   cors: { origin: '*' },
 });
-const botName = 'admin';
 
-// event listeners
-io.on('connection', (socket) => {
-  socket.on('joinRoom', (username) => {
-    // socket -> sends to the user who is connecting -> single client
-    socket.emit('message', formatMessage(botName, 'Welcome to the challange'));
-
-    // Broadcast  -> sends to everybody but the user who is connecting
-    socket.broadcast.emit(
-      'message',
-      formatMessage(botName, 'A User has joined the feed')
-    );
-  });
-
-  // Listen for chatMessage and logActivity from user
-  socket.on('chatMessage', (msg) => {
-    // save msg to database
-    const currentDate = new Date();
-    const chatMessage = new ChallangeFeed({
-      type: msg.type,
-      message: msg.text,
-      date: currentDate,
-      user: msg.userId,
-      challange: msg.challangeId,
-    });
-    chatMessage.save();
-    // find username by id
-    User.findOne({
-      _id: msg.userId,
-    })
-      .then((user) => {
-        // send chat message to every client
-        io.emit('message', formatMessage(user.username, msg.text));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  });
-
-  // Listen for chatMessage and logActivity from user
-  socket.on('logMessage', (msg) => {
-    console.log('activity logged');
-    // save msg to database
-    const currentDate = new Date();
-    const chatMessage = new ChallangeFeed({
-      type: msg.type,
-      message: msg.text,
-      date: currentDate,
-      user: msg.userId,
-      challange: msg.challangeId,
-    });
-    chatMessage.save();
-    // find username by id
-    User.findOne({
-      _id: msg.userId,
-    })
-      .then((user) => {
-        // send chat message to every client
-        io.emit(
-          'message',
-          formatMessage(user.username, 'has performed a repeat ')
-        );
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  });
-
-  // Runs when client disconnects
-  socket.on('disconnect', () => {
-    io.emit('message', formatMessage(botName, 'A User has left the chat')); // io -> sends to all clients
-  });
-});
+// implement socket Listener
+socketService.socketListener(io);
 
 // dotenv
 dotenv.config();

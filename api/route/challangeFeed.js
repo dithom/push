@@ -19,7 +19,6 @@ router.get('/:id', auth, async (request, response) => {
   const challangeFeed = await challangeFeeddb.getChallangeFeedById(
     request.params.id
   );
-  console.log(challangeFeed);
   if (challangeFeed !== null) {
     return response.json(challangeFeed);
   }
