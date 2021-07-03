@@ -1,8 +1,6 @@
 import mongoose from 'mongoose';
 import idValidator from 'mongoose-id-validator';
 
-// Child Referencing: the parent references its children.
-// TODO anderes Schema überlegen, bei einer logActivity braucht es keine message
 const ChallangeLeaderboardSchema = mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,

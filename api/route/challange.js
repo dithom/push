@@ -8,6 +8,7 @@ import Challange from '../model/Challange';
 
 // Import Db Functions
 import challangedb from '../database/challangedb';
+import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
 
 // Import Service Functions
 import formatDateService from '../services/formatDateService';
@@ -137,7 +138,22 @@ router.patch('/addattendees', auth, async (request, response) => {
   const filter = { name: request.body.name };
   const update = { competitors: competitorIds };
   try {
+    // update attendee array in collection
     const challanges = await Challange.findOneAndUpdate(filter, update);
+
+    // add attendees to leaderboard list
+    for (let i = 0; i < competitorIds.length; i++) {
+      challangeLeaderboarddb.saveAttendeetoLeaderboard(
+        competitorIds[i],
+        challanges._id
+      );
+    }
+    // add creator to leaderboard list
+    challangeLeaderboarddb.saveAttendeetoLeaderboard(
+      challanges.creator,
+      challanges._id
+    );
+
     return response.json(challanges);
   } catch (error) {
     return response.status(400).json(error);

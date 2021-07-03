@@ -102,7 +102,6 @@ export default {
         'Add ' + amountCompetitors + ' users to created challange';
     },
     onClickAddAttendees() {
-      this.getAttendee();
       this.noUserFound = '';
       this.addAttendee();
     },
