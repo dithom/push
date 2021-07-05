@@ -13,6 +13,8 @@ import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
 // Import Service Functions
 import formatDateService from '../services/formatDateService';
 import userService from '../services/userService';
+import challangeService from '../services/challangeService';
+
 // Define globals
 const router = express.Router();
 
@@ -118,8 +120,23 @@ router.post(
       });
     }
 
+    // calculate total repetitions and amount of Intervals
+    const totalAmountOfRepetitions = challangeService.calculateAmountOfRepetitions(
+      startDate,
+      endDate,
+      request.body.timespan,
+      request.body.repetitions
+    );
+    const intervals = Math.round(
+      totalAmountOfRepetitions / request.body.repetitions
+    );
+
     // Create new challange
-    const savedChallange = await challangedb.createNewChallange(request);
+    const savedChallange = await challangedb.createNewChallange(
+      request,
+      totalAmountOfRepetitions,
+      intervals
+    );
     if (savedChallange !== null) {
       return response.json(savedChallange);
     }
@@ -143,13 +160,13 @@ router.patch('/addattendees', auth, async (request, response) => {
 
     // add attendees to leaderboard list
     for (let i = 0; i < competitorIds.length; i++) {
-      challangeLeaderboarddb.saveAttendeetoLeaderboard(
+      challangeLeaderboarddb.saveUserToLeaderboard(
         competitorIds[i],
         challanges._id
       );
     }
     // add creator to leaderboard list
-    challangeLeaderboarddb.saveAttendeetoLeaderboard(
+    challangeLeaderboarddb.saveUserToLeaderboard(
       challanges.creator,
       challanges._id
     );
