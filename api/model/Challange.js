@@ -33,10 +33,19 @@ const ChallangeSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  maximumRepetitions: {
+    type: Number,
+    required: true,
+  },
+  // wie of müssen repititions durchgeführt werden?
+  intervals: {
+    type: Number,
+    required: true,
+  },
   timespan: {
     type: String,
     required: true,
-    enum: ['minute', 'hour', 'day', 'week', 'month'],
+    enum: ['day', 'week', 'month'],
   },
   visibility: {
     type: String,

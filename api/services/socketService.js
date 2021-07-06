@@ -1,11 +1,8 @@
-// Import models
-import ChallangeFeed from '../model/ChallangeFeed';
-import User from '../model/User';
-
 // import utils
 import formatMessage from '../utils/messagesService';
 // Import Db Functions
 import challangeFeeddb from '../database/challangeFeeddb';
+import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
 import userdb from '../database/userdb';
 
 function socketListener(io) {
@@ -31,15 +28,21 @@ function socketListener(io) {
         });
     });
 
-    // Listen for chatMessage and logActivity from user
+    // Listen for logActivity from user
     socket.on('logMessage', (message) => {
-      console.log('activity logged');
       // save msg to database
       try {
         challangeFeeddb.saveChatMessage(message);
       } catch (error) {
         console.log(error);
       }
+      // save accomplished activity to db
+
+      challangeLeaderboarddb.updateLeaderboard(
+        message.userId,
+        message.challangeId
+      );
+
       // find username by id
       userdb
         .getUserById(message.userId)

@@ -12,13 +12,18 @@ const ChallangeLeaderboardSchema = mongoose.Schema({
     ref: 'Challange',
     required: true,
   },
-  totalrepititions: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
   // accomplished repitions per timespan
   timespanrepititions: {
+    type: Array,
+    required: true,
+    default: [
+      {
+        intervalNumber: 1,
+        accomplishedRepititions: 0,
+      },
+    ],
+  },
+  totalrepititions: {
     type: Number,
     required: true,
     default: 0,

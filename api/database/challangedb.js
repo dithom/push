@@ -58,7 +58,11 @@ async function getArchivedChallangesOfUser(userid) {
   }
 }
 
-async function createNewChallange(request) {
+async function createNewChallange(
+  request,
+  totalAmountOfRepetitions,
+  amountOfIntervals
+) {
   const newChallange = new Challange({
     name: request.body.name,
     description: request.body.description,
@@ -66,6 +70,8 @@ async function createNewChallange(request) {
     startDate: request.body.startDate,
     endDate: request.body.endDate,
     repetitions: request.body.repetitions,
+    maximumRepetitions: totalAmountOfRepetitions,
+    intervals: amountOfIntervals,
     timespan: request.body.timespan,
     creator: request.userId,
     visibility: request.body.visibility,

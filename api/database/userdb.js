@@ -16,7 +16,6 @@ async function getUserByName(name) {
     const user = await User.findOne({
       username: name,
     });
-    console.log(user);
     return user;
   } catch (error) {
     return error;

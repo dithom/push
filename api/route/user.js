@@ -50,7 +50,8 @@ router.get('/highscore', auth, async (request, response) => {
  */
 router.get('/userinformation/:id', auth, async (request, response) => {
   // Check if ID matches one in the users table and change archived to true
-  const user = await userdb.getUserById(request.userId);
+  const user = await userdb.getUserById(request.params.id);
+
   if (user !== null) {
     return response.json(user);
   }

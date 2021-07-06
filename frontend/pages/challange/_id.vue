@@ -1,7 +1,7 @@
 <!--
-Profile
+challange feed
 ===
-Shows Profile Information of User
+Shows challange feed 
 -->
 
 <template>
@@ -82,11 +82,13 @@ export default {
     const amountCompetitors = this.amountOfCompetitors;
     if (amountCompetitors > 0) {
       for (let i = 0; i < amountCompetitors; i++) {
+        console.log('user id', this.challange.competitors[i]);
         const routeURl =
           '/user/userinformation/' + this.challange.competitors[i];
         const response = await this.$axios.$get(routeURl, {
           headers: { 'auth-token': this.$store.state.session.authToken },
         });
+        console.log('response.username', response.username);
         this.attendees.push(response.username);
       }
       // get creator of the challange
@@ -121,6 +123,7 @@ export default {
       this.outputMessage(message);
     }
 
+    /*
     const UserAccomplishedChallangesMap = {};
     // extract logged activities per competitor with idUserMap
     for (const [key, value] of Object.entries(userIdMap)) {
@@ -137,6 +140,7 @@ export default {
     }
     this.userTotalRepetitionsMap = UserAccomplishedChallangesMap;
     console.log('UserAccomplishedChallangesMap', UserAccomplishedChallangesMap);
+    */
 
     this.calculateRemainingTime(this.challange.endDate);
   },
