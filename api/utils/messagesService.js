@@ -8,4 +8,16 @@ function formatMessage(username, text) {
   };
 }
 
-module.exports = formatMessage;
+function formatLeaderboardRow(
+  userName,
+  totalRepetitions,
+  currentIntervalRepetitions
+) {
+  return {
+    username: userName,
+    totalrepetitions: totalRepetitions,
+    currentIntervalRepetitions,
+  };
+}
+
+module.exports = { formatMessage, formatLeaderboardRow };

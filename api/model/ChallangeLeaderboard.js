@@ -13,17 +13,17 @@ const ChallangeLeaderboardSchema = mongoose.Schema({
     required: true,
   },
   // accomplished repitions per timespan
-  timespanrepititions: {
+  timespanrepetitions: {
     type: Array,
     required: true,
     default: [
       {
-        intervalNumber: 1,
+        intervalNumber: 0,
         accomplishedRepititions: 0,
       },
     ],
   },
-  totalrepititions: {
+  totalrepetitions: {
     type: Number,
     required: true,
     default: 0,

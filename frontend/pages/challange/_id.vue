@@ -20,8 +20,8 @@ Shows challange feed
       <div v-for="(item, index) in attendees" :key="item">
         {{ index + 1 }}. : {{ item }} -
       </div>
-      <div v-for="(item, index) in userTotalRepetitionsMap" :key="item">
-        {{ index }} - Total Repetitions: {{ item }}
+      <div v-for="(item, index, index2) in userTotalRepetitionsMap" :key="item">
+        {{ index }} - Total Repetitions: {{ item }} {{ index2 }}
       </div>
     </div>
     <div class="chat-container">
@@ -123,6 +123,14 @@ export default {
       this.outputMessage(message);
     }
 
+    // get leaderboard from api
+    routeURl = 'challangeLeaderboard/' + this.$route.params.id;
+    const challangeLeaderboard = await this.$axios.$get(routeURl, {
+      headers: { 'auth-token': this.$store.state.session.authToken },
+    });
+
+    this.userTotalRepetitionsMap = challangeLeaderboard;
+    console.log('leaderboard', challangeLeaderboard);
     /*
     const UserAccomplishedChallangesMap = {};
     // extract logged activities per competitor with idUserMap

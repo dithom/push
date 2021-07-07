@@ -1,5 +1,6 @@
 // import utils
 import formatMessage from '../utils/messagesService';
+import challangeService from './challangeService';
 // Import Db Functions
 import challangeFeeddb from '../database/challangeFeeddb';
 import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
@@ -37,11 +38,19 @@ function socketListener(io) {
         console.log(error);
       }
       // save accomplished activity to db
-
-      challangeLeaderboarddb.updateLeaderboard(
+      challangeLeaderboarddb.updateTotalRepetitions(
         message.userId,
         message.challangeId
       );
+      challangeService
+        .identifyCurrentInterval(message.challangeId)
+        .then((currentInterval) =>
+          challangeLeaderboarddb.updateIntervalRepetitions(
+            message.userId,
+            message.challangeId,
+            currentInterval
+          )
+        );
 
       // find username by id
       userdb
