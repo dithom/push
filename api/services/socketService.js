@@ -1,5 +1,5 @@
 // import utils
-import formatMessage from '../utils/messagesService';
+import messageService from '../utils/messagesService';
 import challangeService from './challangeService';
 // Import Db Functions
 import challangeFeeddb from '../database/challangeFeeddb';
@@ -59,7 +59,10 @@ function socketListener(io) {
           // send chat message to every client
           io.emit(
             'message',
-            formatMessage(user.username, 'has performed an activity ')
+            messageService.formatMessage(
+              user.username,
+              'has performed an activity '
+            )
           );
         })
         .catch((err) => {
