@@ -24,14 +24,25 @@ Shows challange feed
       <div v-for="(item, index) in userTotalRepetitionsMap" :key="index">
         {{ index }} - Total Repetitions: {{ item }}
       </div>
+      <div v-if="loaded" class="grid">
+        <div
+          v-for="(item, index) in datacollection"
+          :key="index"
+          class="grid-item"
+        >
+          <PieChart :data="item" />
+        </div>
+      </div>
+      <!--
       <div class="chart-container">
-        <!-- eslint-disable-next-line vue/attribute-hyphenation -->
+         eslint-disable-next-line vue/attribute-hyphenation x
         <pie-chart
           v-if="loaded"
           ref="chart"
           :data="datacollection[1]"
         ></pie-chart>
       </div>
+      -->
     </div>
     <div class="chat-container">
       <header class="chat-header">
@@ -308,7 +319,11 @@ export default {
 
 <style>
 .small {
-  max-width: 600px;
+  max-width: 300px;
   margin: 150px auto;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 </style>

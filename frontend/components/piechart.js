@@ -7,23 +7,12 @@ export default {
     this.renderChart(this.data, this.options);
   },
   watch: {
+    // Rerender when data changes
     data() {
       console.log('data changed');
       // eslint-disable-next-line no-underscore-dangle
       this.$data._chart.destroy();
       this.renderChart(this.data, this.options);
     },
-    //   deep: true,
-    // immediate: true,
   },
-  /*
-  methods: {
-    render(newData) {
-      console.log('moin');
-      // eslint-disable-next-line no-underscore-dangle
-      this.$data._chart.destroy();
-      this.renderChart(newData, this.options);
-    },
-  },
-  */
 };
