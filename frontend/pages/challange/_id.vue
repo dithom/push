@@ -20,8 +20,17 @@ Shows challange feed
       <div v-for="(item, index) in attendees" :key="item">
         {{ index + 1 }}. : {{ item }} -
       </div>
-      <div v-for="(item, index, index2) in userTotalRepetitionsMap" :key="item">
-        {{ index }} - Total Repetitions: {{ item }} {{ index2 }}
+
+      <div v-for="(item, index) in userTotalRepetitionsMap" :key="index">
+        {{ index }} - Total Repetitions: {{ item }}
+      </div>
+      <div class="chart-container">
+        <!-- eslint-disable-next-line vue/attribute-hyphenation -->
+        <pie-chart
+          v-if="loaded"
+          ref="chart"
+          :data="datacollection[1]"
+        ></pie-chart>
       </div>
     </div>
     <div class="chat-container">
@@ -55,16 +64,25 @@ Shows challange feed
 
 <script>
 import formatMessage from '../../utils/messageFormatService';
+import createDataOject from '../../utils/chartDataService';
+import PieChart from '../../components/piechart.js';
+
 export default {
+  components: {
+    // eslint-disable-next-line vue/no-unused-components
+    PieChart,
+  },
   middleware: ['auth'],
   data() {
     return {
+      loaded: false,
       challange: '',
       amountOfCompetitors: 0,
       attendees: [],
       creator: '',
       remainingDays: 0,
-      userTotalRepetitionsMap: {},
+      userTotalRepetitionsMap: [],
+      datacollection: [],
     };
   },
 
@@ -123,7 +141,7 @@ export default {
       this.outputMessage(message);
     }
 
-    // get leaderboard from api
+    // get leaderboard from api with current Interval Repetitions
     routeURl = 'challangeLeaderboard/' + this.$route.params.id;
     const challangeLeaderboard = await this.$axios.$get(routeURl, {
       headers: { 'auth-token': this.$store.state.session.authToken },
@@ -131,28 +149,17 @@ export default {
 
     this.userTotalRepetitionsMap = challangeLeaderboard;
     console.log('leaderboard', challangeLeaderboard);
-    /*
-    const UserAccomplishedChallangesMap = {};
-    // extract logged activities per competitor with idUserMap
-    for (const [key, value] of Object.entries(userIdMap)) {
-      let amountOfAccomplishedChallanges = 0;
-      for (let i = 0; i < response.length; i++) {
-        if (
-          response[i].type === 'accomplishedActivity' &&
-          response[i].user === value
-        ) {
-          amountOfAccomplishedChallanges++;
-        }
-        UserAccomplishedChallangesMap[key] = amountOfAccomplishedChallanges;
-      }
-    }
-    this.userTotalRepetitionsMap = UserAccomplishedChallangesMap;
-    console.log('UserAccomplishedChallangesMap', UserAccomplishedChallangesMap);
-    */
 
+    // create pie charts with remaining activities for all users
+    this.updateData();
+
+    // this.outputchart(challangeLeaderboard[i].username, i);
+
+    this.loaded = true;
     this.calculateRemainingTime(this.challange.endDate);
   },
   mounted() {
+    this.loaded = false;
     this.socket = this.$nuxtSocket({
       name: 'home',
     });
@@ -161,7 +168,6 @@ export default {
 
     /* Listen for events on socket: */
     this.socket.on('message', (msg, cb) => {
-      console.log(msg);
       this.outputMessage(msg);
 
       // Scroll down
@@ -208,6 +214,30 @@ export default {
       document.querySelector('.chat-messages').appendChild(div);
     },
 
+    /*
+    // Output message to DOM
+    outputchart(username, i) {
+      // create message div
+      const div = document.createElement('div');
+      console.log(' make pie chart of ', username);
+      // eslint-disable-next-line no-unused-vars
+      const data = this.datacollection[i];
+      // div.innerHTML = `<pie-chart :chart-data=${data}></pie-chart>`;
+      // add new div (message) to div chat messages
+      document.querySelector('.chart-container').appendChild(div);
+      const newCan = document.createElement('canvas');
+      div.appendChild(newCan);
+      newCan.id = 'canvas' + [i];
+      // const canv = 'canvas' + [i];
+      // this.create_chart(data, canv);
+    },
+    create_chart(setData, canvas) {
+      const ctx = document.getElementById(canvas).getContext('2d');
+      // eslint-disable-next-line no-new
+      new PieChart(ctx, { data: setData });
+
+      
+    }, */
     getMessage() {
       this.socket.on('getMessage', { id: 'abc123' }, (resp) => {
         this.messageRxd = resp;
@@ -226,10 +256,18 @@ export default {
       );
 
       // increase amount of Repetitions of user in UI
-
-      this.userTotalRepetitionsMap[this.$store.state.session.username] =
-        this.userTotalRepetitionsMap[this.$store.state.session.username] + 1;
-
+      for (let i = 0; i < this.userTotalRepetitionsMap.length; i++) {
+        if (
+          this.userTotalRepetitionsMap[i].username ===
+          this.$store.state.session.username
+        ) {
+          this.userTotalRepetitionsMap[i].totalrepetitions =
+            this.userTotalRepetitionsMap[i].totalrepetitions + 1;
+          this.userTotalRepetitionsMap[i].currentIntervalRepetitions =
+            this.userTotalRepetitionsMap[i].currentIntervalRepetitions + 1;
+        }
+      }
+      this.updateData();
       console.log('activity logged');
     },
     onClickBack() {
@@ -247,6 +285,30 @@ export default {
 
       this.remainingDays = Math.floor(daysDifference);
     },
+    // update data of pie charts
+    updateData() {
+      this.datacollection = [];
+      for (let i = 0; i < this.userTotalRepetitionsMap.length; i++) {
+        // fill data object for pie charts
+        const remainingActivities =
+          this.challange.repetitions -
+          this.userTotalRepetitionsMap[i].currentIntervalRepetitions;
+        this.datacollection.push(
+          createDataOject(
+            this.userTotalRepetitionsMap[i].currentIntervalRepetitions,
+            remainingActivities,
+            this.userTotalRepetitionsMap[i].username
+          )
+        );
+      }
+    },
   },
 };
 </script>
+
+<style>
+.small {
+  max-width: 600px;
+  margin: 150px auto;
+}
+</style>
