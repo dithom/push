@@ -22,6 +22,9 @@ Initial page for signed in user. Shows general overview.
       Create new Challenge
     </button>
 
+    <button class="btn btn-primary" @click="onClickInvitation">
+      Invitations
+    </button>
     <p v-if="$fetchState.pending">Fetching Challanges</p>
     <p v-else-if="$fetchState.error">An error occurred :(</p>
     <div v-else>
@@ -103,6 +106,9 @@ export default {
 
     onClickCreateChallenge() {
       this.$router.push('/createChallange');
+    },
+    onClickInvitation() {
+      this.$router.push('/invitations');
     },
   },
 };

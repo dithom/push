@@ -10,6 +10,7 @@ import challangeRoute from './route/challange';
 import challangeFeedRoute from './route/challangeFeed';
 import challangeLeaderboardRoute from './route/challangeLeaderboard';
 import userRoute from './route/user';
+import invitationRoute from './route/invitation';
 
 // Import socket services
 import socketService from './services/socketService';
@@ -41,6 +42,7 @@ app.use('/api/v1/challange', challangeRoute);
 app.use('/api/v1/challangeFeed', challangeFeedRoute);
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/challangeLeaderboard', challangeLeaderboardRoute);
+app.use('/api/v1/invitation', invitationRoute);
 
 // Database
 mongoose.connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`, {

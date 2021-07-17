@@ -44,32 +44,34 @@ Shows challange feed
       </div>
       -->
     </div>
-    <div class="chat-container">
-      <header class="chat-header">
-        <h1><i class="fas fa-smile"></i> ChallangeFeed</h1>
-      </header>
-      <main class="chat-main">
-        <div class="chat-messages"></div>
-      </main>
-      <div class="chat-form-container">
-        <form id="chat-form" @submit="onFormSubmit">
-          <input
-            id="msg"
-            type="text"
-            placeholder="Enter Message"
-            required
-            autocomplete="off"
-          />
-          <button class="btn btn-primary" type="submit">
-            <i class="fas fa-paper-plane"></i> Send
+    <div class="container">
+      <div class="chat-container">
+        <header class="chat-header">
+          <h1><i class="fas fa-smile"></i> ChallangeFeed</h1>
+        </header>
+        <main class="chat-main">
+          <div class="chat-messages"></div>
+        </main>
+        <div class="chat-form-container">
+          <form id="chat-form" @submit="onFormSubmit">
+            <input
+              id="msg"
+              type="text"
+              placeholder="Enter Message"
+              required
+              autocomplete="off"
+            />
+            <button class="btn btn-primary" type="submit">
+              <i class="fas fa-paper-plane"></i> Send
+            </button>
+          </form>
+          <button class="btn btn-primary" @click="onLogActivity">
+            Log Activity
           </button>
-        </form>
-        <button class="btn btn-primary" @click="onLogActivity">
-          Log Activity
-        </button>
+        </div>
       </div>
+      <button class="btn btn-primary" @click="onClickBack">Back</button>
     </div>
-    <button class="btn btn-primary" @click="onClickBack">Back</button>
   </div>
 </template>
 
@@ -317,13 +319,13 @@ export default {
 };
 </script>
 
-<style>
-.small {
-  max-width: 300px;
-  margin: 150px auto;
-}
+<style scoped>
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+}
+.chat-container {
+  height: 50px;
+  overflow: 'auto';
 }
 </style>

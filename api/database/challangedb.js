@@ -11,6 +11,17 @@ async function getChallangeById(challangeid) {
   }
 }
 
+async function getChallangeByName(challangeName) {
+  try {
+    const challange = await Challange.findOne({
+      name: challangeName,
+    });
+    return challange;
+  } catch (error) {
+    return error;
+  }
+}
+
 async function getActiveChallangesOfUser(userid) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -87,6 +98,7 @@ async function createNewChallange(
 
 module.exports = {
   getActiveChallangesOfUser,
+  getChallangeByName,
   getArchivedChallangesOfUser,
   createNewChallange,
   getChallangeById,

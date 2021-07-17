@@ -28,6 +28,12 @@ const ChallangeLeaderboardSchema = mongoose.Schema({
     required: true,
     default: 0,
   },
+  invitationstatus: {
+    type: String,
+    required: true,
+    default: 'pending',
+    enum: ['pending', 'declined', 'accepted'],
+  },
 });
 
 module.exports = mongoose.model(

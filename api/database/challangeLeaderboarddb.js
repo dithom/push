@@ -1,7 +1,7 @@
 // Import models
 import ChallangeLeaderboard from '../model/ChallangeLeaderboard';
 
-async function saveUserToLeaderboard(userid, challangeid) {
+async function saveUserToLeaderboard(userid, challangeid, answer) {
   try {
     const userLeaderboard = new ChallangeLeaderboard({
       user: userid,
@@ -13,6 +13,7 @@ async function saveUserToLeaderboard(userid, challangeid) {
           accomplishedRepititions: 0,
         },
       ],
+      invitationstatus: answer,
     });
 
     userLeaderboard.save();
@@ -33,6 +34,24 @@ async function updateTotalRepetitions(userid, challangeid) {
     );
     console.log('updated', challanges);
     return challanges;
+  } catch (error) {
+    return error;
+  }
+}
+
+async function updateInvitationStatus(userid, challangeid, answer) {
+  const options = { returnNewDocument: true };
+  const filter = { user: userid, challange: challangeid };
+  const update = { $set: { invitationstatus: answer } };
+  try {
+    // update attendee array in collection
+    const challangesLeaderboard = await ChallangeLeaderboard.findOneAndUpdate(
+      filter,
+      update,
+      options
+    );
+
+    return challangesLeaderboard;
   } catch (error) {
     return error;
   }
@@ -72,7 +91,6 @@ async function updateIntervalRepetitions(userid, challangeid, currentInterval) {
     }
     return result;
   } catch (error) {
-    console.log('error', error);
     return error;
   }
 }
@@ -81,6 +99,7 @@ async function getChallangeLeaderboardByChallangeId(challangeid) {
   try {
     const challangeLeaderboard = await ChallangeLeaderboard.find({
       challange: challangeid,
+      invitationStatus: 'accepted',
     });
     return challangeLeaderboard;
   } catch (error) {
@@ -93,4 +112,5 @@ module.exports = {
   updateTotalRepetitions,
   updateIntervalRepetitions,
   getChallangeLeaderboardByChallangeId,
+  updateInvitationStatus,
 };

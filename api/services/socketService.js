@@ -22,7 +22,10 @@ function socketListener(io) {
         .getUserById(message.userId)
         .then((user) => {
           // send chat message to every client
-          io.emit('message', formatMessage(user.username, message.text));
+          io.emit(
+            'message',
+            messageService.formatMessage(user.username, message.text)
+          );
         })
         .catch((err) => {
           console.log(err);

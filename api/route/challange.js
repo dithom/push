@@ -9,6 +9,7 @@ import Challange from '../model/Challange';
 // Import Db Functions
 import challangedb from '../database/challangedb';
 import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
+import invitationdb from '../database/invitationdb';
 
 // Import Service Functions
 import formatDateService from '../services/formatDateService';
@@ -137,6 +138,14 @@ router.post(
       totalAmountOfRepetitions,
       intervals
     );
+
+    // add creator to leaderboard list
+    await challangeLeaderboarddb.saveUserToLeaderboard(
+      savedChallange.creator,
+      savedChallange._id,
+      'accepted'
+    );
+
     if (savedChallange !== null) {
       return response.json(savedChallange);
     }
@@ -150,7 +159,28 @@ router.post(
  * @returns {Object} Created challange
  */
 router.patch('/addattendees', auth, async (request, response) => {
+  // TODO Don't add users here -> send each user an invitation in this route
   const competitorIds = userService.mapUsernamesToIds(request.body.competitors);
+  const challange = await challangedb.getChallangeByName(request.body.name);
+  try {
+    // s
+    for (let i = 0; i < competitorIds.length; i++) {
+      invitationdb.saveInvitation(request, competitorIds[i], challange._id);
+    }
+    // add attendees to leaderboard list
+    for (let i = 0; i < competitorIds.length; i++) {
+      await challangeLeaderboarddb.saveUserToLeaderboard(
+        competitorIds[i],
+        challange._id,
+        'pending'
+      );
+    }
+    return response.json('saved');
+  } catch (error) {
+    return response.status(400).json(error);
+  }
+});
+/*
   // find and update challange by name
   const filter = { name: request.body.name };
   const update = { competitors: competitorIds };
