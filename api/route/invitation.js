@@ -16,18 +16,19 @@ import leaderboardService from '../services/leaderboardService';
 const router = express.Router();
 
 /**
- * Finds invitation
+ * Finds all pending invitations of user
  * Method: GET
  * @returns {Array<Object>} invitationList
  */
 router.get('/:id', auth, async (request, response) => {
-  const invitations = await invitationdb.getInvitationsByUserId(
+  const invitations = await invitationdb.getPendingInvitationsByUserId(
     request.params.id
   );
 
   const invitationList = await invitationService.createInvitations(invitations);
   // Format invitation Response
 
+  console.log('invitationlist', invitationList);
   if (invitationList !== null) {
     return response.json(invitationList);
   }
@@ -35,17 +36,17 @@ router.get('/:id', auth, async (request, response) => {
 });
 
 /**
- * Update Challange with attendees
+ * Update invitation answer of user
  * Method: PATCH
  * @returns {Object} Created challange
  */
 router.patch('/answer', auth, async (request, response) => {
-  console.log('i am hiere', request.body.id);
   try {
-    const updatedInvitation = await leaderboardService.updateInvitationAnswer(
+    const updatedInvitation = await invitationService.updateInvitationAnswer(
       request.body.id,
       request.body.answer
     );
+    // TODO should answered invitations be deleted from the db?
 
     return response.json(updatedInvitation);
   } catch (error) {

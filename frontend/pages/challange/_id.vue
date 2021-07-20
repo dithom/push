@@ -33,16 +33,6 @@ Shows challange feed
           <PieChart :data="item" />
         </div>
       </div>
-      <!--
-      <div class="chart-container">
-         eslint-disable-next-line vue/attribute-hyphenation x
-        <pie-chart
-          v-if="loaded"
-          ref="chart"
-          :data="datacollection[1]"
-        ></pie-chart>
-      </div>
-      -->
     </div>
     <div class="container">
       <div class="chat-container">
@@ -70,6 +60,9 @@ Shows challange feed
           </button>
         </div>
       </div>
+      <button class="btn btn-primary" @click="onClickLeave">
+        Leave Challange
+      </button>
       <button class="btn btn-primary" @click="onClickBack">Back</button>
     </div>
   </div>
@@ -284,6 +277,10 @@ export default {
       console.log('activity logged');
     },
     onClickBack() {
+      this.$router.push('/dashboard');
+    },
+    onClickLeave() {
+      // TODO Implement route for leaving invitation (set status to passive)
       this.$router.push('/dashboard');
     },
     calculateRemainingTime(endDate) {

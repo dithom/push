@@ -17,11 +17,13 @@ async function saveInvitation(invitation, competitorId, challangeId) {
   }
 }
 
-async function getInvitationsByUserId(userid) {
+async function getPendingInvitationsByUserId(userid) {
+  console.log('userid', userid);
   try {
     const invitations = await Invitation.find({
-      receiver: userid,
+      $and: [{ receiver: userid }, { invitationstatus: 'pending' }],
     });
+    console.log('pending invitations', invitations);
     return invitations;
   } catch (error) {
     return error;
@@ -39,8 +41,28 @@ async function getInvitationById(invitationid) {
   }
 }
 
+async function updateInvitationStatus(userid, challangeid, answer) {
+  const options = { returnNewDocument: true };
+  const filter = { receiver: userid, challange: challangeid };
+  const update = { $set: { invitationstatus: answer } };
+  console.log('moin', userid);
+  try {
+    // update attendee array in collection
+    const challangesLeaderboard = await Invitation.findOneAndUpdate(
+      filter,
+      update,
+      options
+    );
+
+    return challangesLeaderboard;
+  } catch (error) {
+    return error;
+  }
+}
+
 module.exports = {
   saveInvitation,
-  getInvitationsByUserId,
+  getPendingInvitationsByUserId,
   getInvitationById,
+  updateInvitationStatus,
 };

@@ -13,7 +13,7 @@ async function saveUserToLeaderboard(userid, challangeid, answer) {
           accomplishedRepititions: 0,
         },
       ],
-      invitationstatus: answer,
+      status: answer,
     });
 
     userLeaderboard.save();
@@ -42,7 +42,7 @@ async function updateTotalRepetitions(userid, challangeid) {
 async function updateInvitationStatus(userid, challangeid, answer) {
   const options = { returnNewDocument: true };
   const filter = { user: userid, challange: challangeid };
-  const update = { $set: { invitationstatus: answer } };
+  const update = { $set: { status: answer } };
   try {
     // update attendee array in collection
     const challangesLeaderboard = await ChallangeLeaderboard.findOneAndUpdate(

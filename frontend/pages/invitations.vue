@@ -11,23 +11,23 @@ Shows Inivitations of user
     <div class="invitations"></div>
 
     <div
-      v-for="invitation in invitations"
-      :key="invitation.id"
+      v-for="(item, index) in invitations"
+      :key="item.id"
       class="invitationstest"
     >
       <p class="meta">
-        {{ invitation.sender }} invited you to the {{ invitation.challange }}
+        {{ item.sender }} invited you to the {{ item.challange }}
         challange. Do you accept?
       </p>
       <button
         class="btn btn-primary"
-        @click="answerInvitation(invitation.id, 0)"
+        @click="answerInvitation(item.id, 0, index)"
       >
         Yes
       </button>
       <button
         class="btn btn-primary"
-        @click="answerInvitation(invitation.id, 1)"
+        @click="answerInvitation(item.id, 1, index)"
       >
         No
       </button>
@@ -38,6 +38,7 @@ Shows Inivitations of user
 </template>
 
 <script>
+// TODO Create dialog window when no or yes is clicked
 export default {
   middleware: ['auth'],
   data() {
@@ -56,10 +57,10 @@ export default {
     this.invitations = response;
   },
   methods: {
-    async answerInvitation(invitationid, index) {
+    async answerInvitation(invitationid, indexButton, indexArray) {
       // Check for user answer, which button was pressed
       let userAnswer = '';
-      if (index === 0) {
+      if (indexButton === 0) {
         userAnswer = 'accepted';
       } else {
         userAnswer = 'declined';
@@ -75,14 +76,8 @@ export default {
         { headers: { 'auth-token': this.$store.state.session.authToken } }
       );
       console.log(response);
-
-      /*
-      const routeURl = '/invitation/answer/' + invitationid;
-      const response = this.$axios.$patch(routeURl, {
-        headers: { 'auth-token': this.$store.state.session.authToken },
-      });
-      console.log(response);
-      */
+      // TODO update invitation status in html , buttons must vanish
+      this.invitations.splice(indexArray, 1);
     },
     onClickBack() {
       this.$router.push('/dashboard');

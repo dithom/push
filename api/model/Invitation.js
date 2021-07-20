@@ -23,6 +23,12 @@ const InvitationSchema = mongoose.Schema({
     type: Date,
     required: true,
   },
+  invitationstatus: {
+    type: String,
+    required: true,
+    default: 'pending',
+    enum: ['pending', 'declined', 'accepted'],
+  },
 });
 
 module.exports = mongoose.model(

@@ -143,7 +143,7 @@ router.post(
     await challangeLeaderboarddb.saveUserToLeaderboard(
       savedChallange.creator,
       savedChallange._id,
-      'accepted'
+      'active'
     );
 
     if (savedChallange !== null) {
@@ -172,7 +172,7 @@ router.patch('/addattendees', auth, async (request, response) => {
       await challangeLeaderboarddb.saveUserToLeaderboard(
         competitorIds[i],
         challange._id,
-        'pending'
+        'passive'
       );
     }
     return response.json('saved');
