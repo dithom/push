@@ -75,7 +75,6 @@ import PieChart from '../../components/piechart.js';
 
 export default {
   components: {
-    // eslint-disable-next-line vue/no-unused-components
     PieChart,
   },
   middleware: ['auth'],

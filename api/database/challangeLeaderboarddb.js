@@ -99,7 +99,7 @@ async function getChallangeLeaderboardByChallangeId(challangeid) {
   try {
     const challangeLeaderboard = await ChallangeLeaderboard.find({
       challange: challangeid,
-      invitationStatus: 'accepted',
+      status: 'active',
     });
     return challangeLeaderboard;
   } catch (error) {

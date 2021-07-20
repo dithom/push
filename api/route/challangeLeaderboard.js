@@ -27,6 +27,7 @@ router.get('/:id', auth, async (request, response) => {
   const currentInterval = await challangeService.identifyCurrentInterval(
     request.params.id
   );
+
   const leaderboard = [];
   if (challangeLeaderboard !== null) {
     for (let i = 0; i < challangeLeaderboard.length; i++) {
@@ -41,7 +42,7 @@ router.get('/:id', auth, async (request, response) => {
           accomplishedRepititions = interval.accomplishedRepititions;
         }
 
-        console.log(interval);
+        console.log('intervla', interval);
       });
 
       const userObject = messageService.formatLeaderboardRow(
@@ -52,8 +53,7 @@ router.get('/:id', auth, async (request, response) => {
       leaderboard.push(userObject);
     }
 
-    console.log(leaderboard);
-
+    console.log('leaderboard', leaderboard);
     return response.json(leaderboard);
   }
   return response.status(400).json(challangeLeaderboard);

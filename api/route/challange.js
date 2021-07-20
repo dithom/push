@@ -180,32 +180,6 @@ router.patch('/addattendees', auth, async (request, response) => {
     return response.status(400).json(error);
   }
 });
-/*
-  // find and update challange by name
-  const filter = { name: request.body.name };
-  const update = { competitors: competitorIds };
-  try {
-    // update attendee array in collection
-    const challanges = await Challange.findOneAndUpdate(filter, update);
-
-    // add attendees to leaderboard list
-    for (let i = 0; i < competitorIds.length; i++) {
-      challangeLeaderboarddb.saveUserToLeaderboard(
-        competitorIds[i],
-        challanges._id
-      );
-    }
-    // add creator to leaderboard list
-    challangeLeaderboarddb.saveUserToLeaderboard(
-      challanges.creator,
-      challanges._id
-    );
-
-    return response.json(challanges);
-  } catch (error) {
-    return response.status(400).json(error);
-  }
-});
 
 /**
  * Get Information of specific Challange (id)
