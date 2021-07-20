@@ -22,7 +22,11 @@ Initial page for signed in user. Shows general overview.
       Create new Challenge
     </button>
 
-    <button class="btn btn-primary" @click="onClickInvitation">
+    <button
+      id="btn-invitation"
+      class="btn btn-primary"
+      @click="onClickInvitation"
+    >
       Invitations
     </button>
     <p v-if="$fetchState.pending">Fetching Challanges</p>
@@ -47,6 +51,7 @@ export default {
   data() {
     return {
       activeChallanges: [],
+      invitations: [],
       score: 0,
     };
   },
@@ -72,6 +77,15 @@ export default {
       }
     );
     this.activeChallanges = responseActiveChallanges;
+
+    // get pending invitations for changing invitation button color
+    const routeURl = '/invitation/' + this.$store.state.session.userid;
+    const response = await this.$axios.$get(routeURl, {
+      headers: { 'auth-token': this.$store.state.session.authToken },
+    });
+    this.invitations = response;
+
+    this.checkInvitations();
   },
   // get Userscore
   /*
@@ -88,6 +102,12 @@ export default {
     },
   },
   methods: {
+    checkInvitations() {
+      if (this.invitations.length > 0) {
+        document.getElementById('btn-invitation').style.backgroundColor = 'Red';
+      }
+    },
+
     onClickLogout() {
       this.$store.commit('session/destroy');
     },
