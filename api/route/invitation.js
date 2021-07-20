@@ -4,13 +4,15 @@ import { body, validationResult } from 'express-validator';
 // Import middleware
 import auth from '../middleware/auth';
 
+// Import models
+import Challange from '../model/Challange';
+
 // Import Db Functions
 import invitationdb from '../database/invitationdb';
 import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
 
 // Import Services
 import invitationService from '../services/invitationService';
-import leaderboardService from '../services/leaderboardService';
 
 // Define globals
 const router = express.Router();
@@ -28,7 +30,6 @@ router.get('/:id', auth, async (request, response) => {
   const invitationList = await invitationService.createInvitations(invitations);
   // Format invitation Response
 
-  console.log('invitationlist', invitationList);
   if (invitationList !== null) {
     return response.json(invitationList);
   }
@@ -47,6 +48,14 @@ router.patch('/answer', auth, async (request, response) => {
       request.body.answer
     );
     // TODO should answered invitations be deleted from the db?
+
+    // add competitor to challange schema if challange was accepted
+
+    // find and update challange by id
+    const filter = { _id: updatedInvitation.challange };
+    const update = { competitors: updatedInvitation.receiver };
+    // update attendee array in collection
+    const challanges = await Challange.findOneAndUpdate(filter, update);
 
     return response.json(updatedInvitation);
   } catch (error) {
