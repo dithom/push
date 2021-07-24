@@ -1,4 +1,8 @@
 import express from 'express';
+
+// Import models
+import User from '../model/User';
+
 // Import middleware
 import auth from '../middleware/auth';
 
@@ -12,63 +16,68 @@ import leaderboardService from '../services/leaderboardService';
 const router = express.Router();
 
 /**
- * Set user mode to archived = true
- * Method: DELETE
- * @returns {Object} Updated user
+ * Returns user information for signed in user
+ * Method: GET
+ * @returns {Object} User
  */
+router.get('/me', auth, async (request, response) => {
+  const user = await User.findById(request.userId);
 
-router.delete('/delete', auth, async (request, response) => {
-  // Check if ID matches one in the users table and change archived to true
-  const user = await userdb.findByIdAndArchive(request.userId);
   if (user !== null) {
     return response.json(user);
   }
-  return response.status(400).json({
-    error: 'Failed to delete User.',
-  });
+
+  return response.status(400).json();
 });
+
+/**
+ * Updates user information for signed in user
+ * Method: PATCH
+ * @returns {Object} User
+ */
+router.patch('/me', auth, async (request, response) => {
+  try {
+    await User.findByIdAndUpdate(request.userId, request.body);
+    const updatedUser = await User.findById(request.userId);
+    return response.json(updatedUser);
+  } catch (error) {
+    //
+  }
+
+  return response.status(400).json();
+});
+
+/**
+ * Returns user information for a user id
+ * Method: GET
+ * @returns {Object} User
+ */
+router.get('/:id', auth, async (request, response) => {
+  try {
+    const user = await User.findById(request.params.id);
+
+    if (user !== null) {
+      return response.json(user);
+    }
+  } catch (error) {
+    //
+  }
+
+  return response.status(400).json();
+});
+
+// Cleaned up until here
 
 /**
  * Get highscore of specific user
  * Method: GET
  * @returns {Number} Highscore
  */
-
 router.get('/highscore', auth, async (request, response) => {
   // Check if ID matches one in the users table and change archived to true
   const user = await userdb.getUserById(request.userId);
   if (user !== null) {
     return response.json({ highscore: user.highscore });
-  }
-  return response.status(400).json(user);
-});
-
-/**
- * Get Information of user(id)
- * Method: GET
- * @returns {Object} Challange
- */
-router.get('/userinformation/:id', auth, async (request, response) => {
-  // Check if ID matches one in the users table and change archived to true
-  const user = await userdb.getUserById(request.params.id);
-
-  if (user !== null) {
-    return response.json(user);
-  }
-  return response.status(400).json(user);
-});
-
-/**
- * Get username of specific user by id
- * Method: GET
- * @returns {Object}  user
- */
-
-router.get('/userinformation', auth, async (request, response) => {
-  // Check if ID matches one in the users table and change archived to true
-  const user = await userdb.getUserById(request.userId);
-  if (user !== null) {
-    return response.json(user);
   }
   return response.status(400).json(user);
 });

@@ -15,6 +15,7 @@ const UserSchema = mongoose.Schema({
     required: true,
     min: 6,
     max: 1023,
+    select: false,
   },
   username: {
     type: String,
@@ -33,7 +34,6 @@ const UserSchema = mongoose.Schema({
     required: true,
     default: 0,
   },
-  
 });
 
 module.exports = mongoose.model('User', UserSchema);
