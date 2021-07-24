@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import http from 'http';
+import socketio from 'socket.io';
 
 // Import routes
 import indexRoute from './route/index';
@@ -12,21 +13,19 @@ import challangeLeaderboardRoute from './route/challangeLeaderboard';
 import userRoute from './route/user';
 import invitationRoute from './route/invitation';
 
-// Import socket services
+// Import socket.io services
 import socketService from './services/socketService';
 
-const socketio = require('socket.io');
-
-// App
+// App with socket.io
 const app = express();
-// socket. io
 const server = http.createServer(app);
-// create new instance attachet to the http server
 const io = socketio(server, {
-  cors: { origin: '*' },
+  cors: {
+    origin: '*',
+  },
 });
 
-// implement socket Listener
+// implement socket listener
 socketService.socketListener(io);
 
 // dotenv
@@ -68,6 +67,7 @@ db.once('open', () => {
 });
 
 // Start server
-server.listen(process.env.SERVER_PORT, () =>
-  console.log(`Server running on port ${process.env.SERVER_PORT}`)
-);
+server.listen(process.env.SERVER_PORT, () => {
+  /* eslint-disable-next-line */
+  console.log(`API server running on port ${process.env.SERVER_PORT}`);
+});
