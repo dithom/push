@@ -9,20 +9,9 @@ import { body, validationResult } from 'express-validator';
 import User from '../model/User';
 import ResetPasswordRequest from '../model/ResetPasswordRequest';
 
-// Import middleware
-import auth from '../middleware/auth';
-
 // Define globals
 const router = express.Router();
 const mailer = sendmail();
-
-/**
- * Returns a authenticated response.
- * Method: GET
- */
-router.get('/auth', auth, (request, response) => {
-  return response.end();
-});
 
 /**
  * Creates a new user.
@@ -188,7 +177,7 @@ router.post(
       });
     }
 
-    // Delete previous requests
+    // Delete previous reset requests
     try {
       await ResetPasswordRequest.deleteMany({
         userId: user._id,

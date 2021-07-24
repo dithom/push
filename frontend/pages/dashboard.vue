@@ -58,6 +58,7 @@ export default {
 
   // get Data from API
   async fetch() {
+    // TODO catch bad responses and redirect to signin
     // Username
 
     const responseUsername = await this.$axios.$get('/user/userinformation', {

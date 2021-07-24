@@ -5,7 +5,7 @@
 
 import cookie from 'js-cookie';
 
-export default async ({ store, $axios, redirect }) => {
+export default ({ store, $axios, redirect }) => {
   if (store.state.session.authenticated) {
     return;
   }
@@ -13,16 +13,8 @@ export default async ({ store, $axios, redirect }) => {
   const cookieToken = cookie.get('session');
 
   if (cookieToken) {
-    try {
-      await $axios.$get('/auth', {
-        headers: { 'auth-token': cookieToken },
-      });
-
-      store.commit('session/init', cookieToken);
-      return;
-    } catch (error) {
-      return redirect('/signin');
-    }
+    store.commit('session/init', cookieToken);
+    return;
   }
 
   return redirect('/signin');
