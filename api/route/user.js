@@ -1,16 +1,11 @@
 import express from 'express';
+import { ObjectID } from 'mongodb';
 
 // Import models
 import User from '../model/User';
 
 // Import middleware
 import auth from '../middleware/auth';
-
-// Import Db Functions
-import userdb from '../database/userdb';
-
-// Import Service Functions
-import leaderboardService from '../services/leaderboardService';
 
 // Define globals
 const router = express.Router();
@@ -48,13 +43,21 @@ router.patch('/me', auth, async (request, response) => {
 });
 
 /**
- * Returns user information for a user id
+ * Returns user information for a user id or username
  * Method: GET
  * @returns {Object} User
  */
-router.get('/:id', auth, async (request, response) => {
+router.get('/:idOrUsername', auth, async (request, response) => {
+  const isId = ObjectID.isValid(request.params.idOrUsername);
+
   try {
-    const user = await User.findById(request.params.id);
+    let user = null;
+
+    if (isId) {
+      user = await User.findById(request.params.idOrUsername);
+    } else {
+      user = await User.findOne({ username: request.params.idOrUsername });
+    }
 
     if (user !== null) {
       return response.json(user);
@@ -64,56 +67,6 @@ router.get('/:id', auth, async (request, response) => {
   }
 
   return response.status(400).json();
-});
-
-// Cleaned up until here
-
-/**
- * Get highscore of specific user
- * Method: GET
- * @returns {Number} Highscore
- */
-router.get('/highscore', auth, async (request, response) => {
-  // Check if ID matches one in the users table and change archived to true
-  const user = await userdb.getUserById(request.userId);
-  if (user !== null) {
-    return response.json({ highscore: user.highscore });
-  }
-  return response.status(400).json(user);
-});
-
-/**
- * Get Challenge Leaderbord (Top-10)
- * Method: GET
- * @returns {Array<Object>} List of highscore and user in descending order
- */
-router.get('/leaderboard', auth, async (request, response) => {
-  const allUsers = await userdb.getAllUsers(request.body.userId);
-  if (allUsers !== 'error') {
-    const leaderboard = leaderboardService.createLeaderboard(allUsers);
-    return response.json(leaderboard);
-  }
-  return response.status(400).json('leaderboard not found');
-});
-
-// TODO check if user is archived or not
-// TODO check if not own username
-
-/**
- * Get userinformation by email or mail
- * Method: GET
- * @returns {Object} user
- */
-
-// TODO Add Body validation
-
-router.post('/getAttendee', auth, async (request, response) => {
-  // Check if ID matches one in the users table and change archived to true
-  const user = await userdb.getUserByName(request.body.username);
-  if (user !== null) {
-    return response.json(user);
-  }
-  return response.status(400).json(user);
 });
 
 module.exports = router;
