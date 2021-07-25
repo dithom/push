@@ -1,12 +1,12 @@
 import express from 'express';
 import { ObjectID } from 'mongodb';
 
+// Import middleware
+import auth from '../middleware/auth';
+
 // Import models
 import User from '../model/User';
 import Challange from '../model/Challange';
-
-// Import middleware
-import auth from '../middleware/auth';
 
 // Define globals
 const router = express.Router();
@@ -55,7 +55,7 @@ router.get('/', auth, async (request, response) => {
   }
 
   if (Object.prototype.hasOwnProperty.call(request.query, 'limit')) {
-    options.limit = parseInt(request.query.limit, 10);
+    options.limit = Math.min(parseInt(request.query.limit, 10), 100);
   }
 
   try {
