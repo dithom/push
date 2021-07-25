@@ -18,7 +18,7 @@ const router = express.Router();
  * @param {string} [sort]
  * @param {string} [order]
  * @param {string} [limit]
- * @returns {Object} User
+ * @returns {Array<Object>} Users
  */
 router.get('/', auth, async (request, response) => {
   let users = [];
@@ -114,7 +114,7 @@ router.patch('/me', auth, async (request, response) => {
  * Returns challanges associated to signed in user (creator or competitor).
  * Method: GET
  * @param {boolean} [completed]
- * @returns {Array<Object>} List of challanges
+ * @returns {Array<Object>} Challanges
  */
 router.get('/me/challanges', auth, async (request, response) => {
   const today = new Date();
