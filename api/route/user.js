@@ -80,10 +80,11 @@ router.get('/', auth, async (request, response) => {
  * @returns {Object} User
  */
 router.get('/me', auth, async (request, response) => {
-  const user = await User.findById(request.userId);
-
-  if (user !== null) {
+  try {
+    const user = await User.findById(request.userId);
     return response.json(user);
+  } catch (error) {
+    //
   }
 
   return response.status(400).json();
@@ -176,9 +177,7 @@ router.get('/:idOrUsername', auth, async (request, response) => {
       user = await User.findOne({ username: request.params.idOrUsername });
     }
 
-    if (user !== null) {
-      return response.json(user);
-    }
+    return response.json(user);
   } catch (error) {
     //
   }
