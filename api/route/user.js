@@ -28,6 +28,10 @@ router.get('/me', auth, async (request, response) => {
 /**
  * Updates user information for signed in user
  * Method: PATCH
+ * @param  {string} [email]
+ * @param  {string} [password]
+ * @param  {string} [username]
+ * @param  {boolean} [archived]
  * @returns {Object} User
  */
 router.patch('/me', auth, async (request, response) => {
