@@ -12,6 +12,69 @@ import auth from '../middleware/auth';
 const router = express.Router();
 
 /**
+ * Returns list of users matching given query parameters limited to 100
+ * Method: GET
+ * @param {string} [search]
+ * @param {string} [sort]
+ * @param {string} [order]
+ * @param {string} [limit]
+ * @returns {Object} User
+ */
+router.get('/', auth, async (request, response) => {
+  let users = [];
+  const query = {};
+  const options = {
+    limit: 100,
+  };
+
+  if (Object.prototype.hasOwnProperty.call(request.query, 'search')) {
+    query.$or = [
+      {
+        username: {
+          $regex: request.query.search,
+          $options: 'i',
+        },
+      },
+      {
+        email: {
+          $regex: request.query.search,
+          $options: 'i',
+        },
+      },
+    ];
+  }
+
+  if (Object.prototype.hasOwnProperty.call(request.query, 'sort')) {
+    let order = 'asc';
+
+    if (Object.prototype.hasOwnProperty.call(request.query, 'order')) {
+      order = request.query.order;
+    }
+
+    options.sort = { [request.query.sort]: order };
+  }
+
+  if (Object.prototype.hasOwnProperty.call(request.query, 'limit')) {
+    options.limit = parseInt(request.query.limit, 10);
+  }
+
+  try {
+    if (
+      Object.keys(query).length !== 0 ||
+      Object.prototype.hasOwnProperty.call(request.query, 'sort')
+    ) {
+      users = await User.find(query, {}, options);
+    }
+
+    return response.json(users);
+  } catch (error) {
+    //
+  }
+
+  return response.status(400).json();
+});
+
+/**
  * Returns user information for signed in user
  * Method: GET
  * @returns {Object} User

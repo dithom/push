@@ -29,7 +29,7 @@ const UserSchema = mongoose.Schema({
     required: true,
     default: false,
   },
-  highscore: {
+  score: {
     type: Number,
     required: true,
     default: 0,
