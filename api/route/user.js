@@ -12,7 +12,7 @@ import auth from '../middleware/auth';
 const router = express.Router();
 
 /**
- * Returns list of users matching given query parameters limited to 100
+ * Returns list of users matching given query parameters limited to 100.
  * Method: GET
  * @param {string} [search]
  * @param {string} [sort]
@@ -75,7 +75,7 @@ router.get('/', auth, async (request, response) => {
 });
 
 /**
- * Returns user information for signed in user
+ * Returns user information for signed in user.
  * Method: GET
  * @returns {Object} User
  */
@@ -90,7 +90,7 @@ router.get('/me', auth, async (request, response) => {
 });
 
 /**
- * Updates user information for signed in user
+ * Updates user information for signed in user.
  * Method: PATCH
  * @param {string} [email]
  * @param {string} [password]
@@ -111,7 +111,7 @@ router.patch('/me', auth, async (request, response) => {
 });
 
 /**
- * Returns challanges associated to signed in user (creator or competitor)
+ * Returns challanges associated to signed in user (creator or competitor).
  * Method: GET
  * @param {boolean} [completed]
  * @returns {Array<Object>} List of challanges
@@ -160,7 +160,7 @@ router.get('/me/challanges', auth, async (request, response) => {
 });
 
 /**
- * Returns user information for a user id or username
+ * Returns user information for a user id or username.
  * Method: GET
  * @returns {Object} User
  */
