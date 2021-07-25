@@ -39,7 +39,7 @@ app.use(cors());
 app.use('/api/v1', indexRoute);
 app.use('/api/v1/challange', challangeRoute);
 app.use('/api/v1/challangeFeed', challangeFeedRoute);
-app.use('/api/v1/user', userRoute);
+app.use('/api/v1/users', userRoute);
 app.use('/api/v1/challangeLeaderboard', challangeLeaderboardRoute);
 app.use('/api/v1/invitation', invitationRoute);
 

@@ -3,6 +3,7 @@ import { ObjectID } from 'mongodb';
 
 // Import models
 import User from '../model/User';
+import Challange from '../model/Challange';
 
 // Import middleware
 import auth from '../middleware/auth';
@@ -28,10 +29,10 @@ router.get('/me', auth, async (request, response) => {
 /**
  * Updates user information for signed in user
  * Method: PATCH
- * @param  {string} [email]
- * @param  {string} [password]
- * @param  {string} [username]
- * @param  {boolean} [archived]
+ * @param {string} [email]
+ * @param {string} [password]
+ * @param {string} [username]
+ * @param {boolean} [archived]
  * @returns {Object} User
  */
 router.patch('/me', auth, async (request, response) => {
@@ -39,6 +40,55 @@ router.patch('/me', auth, async (request, response) => {
     await User.findByIdAndUpdate(request.userId, request.body);
     const updatedUser = await User.findById(request.userId);
     return response.json(updatedUser);
+  } catch (error) {
+    //
+  }
+
+  return response.status(400).json();
+});
+
+/**
+ * Returns challanges associated to signed in user (creator or competitor)
+ * Method: GET
+ * @param {boolean} [completed]
+ * @returns {Array<Object>} List of challanges
+ */
+router.get('/me/challanges', auth, async (request, response) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  try {
+    const query = {
+      $or: [
+        {
+          creator: request.userId,
+        },
+        {
+          competitors: request.userId,
+        },
+      ],
+      $and: [
+        {
+          endDate: {
+            $gt: today,
+          },
+        },
+      ],
+    };
+
+    if (Object.prototype.hasOwnProperty.call(request.query, 'completed')) {
+      query.$and = [
+        {
+          endDate: {
+            $lte: today,
+          },
+        },
+      ];
+    }
+
+    const challanges = await Challange.find(query);
+
+    return response.json(challanges);
   } catch (error) {
     //
   }
