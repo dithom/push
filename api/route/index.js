@@ -16,9 +16,9 @@ const mailer = sendmail();
 /**
  * Creates a new user.
  * Method: POST
- * @param  {string} email
- * @param  {string} password
- * @param  {string} username
+ * @param {string} email
+ * @param {string} password
+ * @param {string} username
  * @returns {Object} Created user
  */
 router.post(
@@ -81,8 +81,8 @@ router.post(
 /**
  * Signs in an existing user.
  * Method: POST
- * @param  {string} email
- * @param  {string} password
+ * @param {string} email
+ * @param {string} password
  * @returns {Object} JWT containing the user id
  */
 router.post(
@@ -144,7 +144,7 @@ router.post(
 /**
  * Creates a new reset password request and sends an email.
  * Method: POST
- * @param  {string} email
+ * @param {string} email
  * @returns {Object} Success message
  */
 router.post(
@@ -232,7 +232,7 @@ router.post(
 /**
  * Resets password for an existing reset password request.
  * Method: POST
- * @param  {string} resetId
+ * @param {string} resetId
  * @param {string} password
  * @returns {Object} Updated user
  */
