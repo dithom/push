@@ -7,11 +7,10 @@ import socketio from 'socket.io';
 
 // Import routes
 import indexRoute from './route/index';
+import userRoute from './route/user';
 import challangeRoute from './route/challange';
 import challangeFeedRoute from './route/challangeFeed';
 import challangeLeaderboardRoute from './route/challangeLeaderboard';
-import userRoute from './route/user';
-import invitationRoute from './route/invitation';
 
 // Import socket.io services
 import socketService from './services/socketService';
@@ -37,11 +36,11 @@ app.use(cors());
 
 // Routes
 app.use('/api/v1', indexRoute);
-app.use('/api/v1/challange', challangeRoute);
-app.use('/api/v1/challangeFeed', challangeFeedRoute);
 app.use('/api/v1/users', userRoute);
+app.use('/api/v1/challanges', challangeRoute);
+app.use('/api/v1/challangeFeed', challangeFeedRoute);
 app.use('/api/v1/challangeLeaderboard', challangeLeaderboardRoute);
-app.use('/api/v1/invitation', invitationRoute);
+// app.use('/api/v1/invitation', invitationRoute);
 
 // Database
 mongoose.connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}`, {

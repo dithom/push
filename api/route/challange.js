@@ -1,87 +1,152 @@
 import express from 'express';
+import { ObjectID } from 'mongodb';
 import { body, validationResult } from 'express-validator';
 
 // Import middleware
 import auth from '../middleware/auth';
+
 // Import models
+import User from '../model/User';
 import Challange from '../model/Challange';
-
-// Import Db Functions
-import challangedb from '../database/challangedb';
-import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
-import invitationdb from '../database/invitationdb';
-
-// Import Service Functions
-import formatDateService from '../services/formatDateService';
-import userService from '../services/userService';
-import challangeService from '../services/challangeService';
+import ChallangeInvitation from '../model/ChallangeInvitation';
 
 // Define globals
 const router = express.Router();
 
-// TODO Find solution for challange feeds. Separate collection or put it into challange?
-// TODO GET Endpoint for getting a specific challange at /:id including optional ?feed parameter to populate feed (if this will be done as referance)
-// TODO PATCH Endpoint for updating properties of a specific challange at /:id
-// TODO PUT Endpoint for overriding a specific challange at /:id (maybe for v2)
 // TODO Find solution for DELETE Endpoint, as we can not simply delete a challange for all competitors
-// TODO After Challange creation, each competitor has to accept the challange -> how is this messaged sent?
 
 /**
- * Finds active challanges associated to signed in user (creator or competitor)
+ * Returns list of challanges matching given query parameters limited to 100.
  * Method: GET
- * @returns {Array<Object>} List of challanges
+ * @param {string} [search]
+ * @param {string} [sort]
+ * @param {string} [order]
+ * @param {string} [limit]
+ * @returns {Array<Object>} Challanges
  */
-router.get('/active', auth, async (request, response) => {
-  const challanges = await challangedb.getActiveChallangesOfUser(
-    request.userId
-  );
-  if (challanges !== null) {
-    return response.json(challanges);
+router.get('/', auth, async (request, response) => {
+  let challanges = [];
+  const query = {};
+  const options = {
+    limit: 100,
+    populate: [
+      {
+        path: 'participants',
+        select: ['username', 'score'],
+      },
+      {
+        path: 'creator',
+        select: ['username', 'score'],
+      },
+    ],
+  };
+
+  if (Object.prototype.hasOwnProperty.call(request.query, 'search')) {
+    query.name = {
+      $regex: request.query.search,
+      $options: 'i',
+    };
+
+    query.visibility = 'public';
   }
-  return response.status(400).json(challanges);
+
+  if (Object.prototype.hasOwnProperty.call(request.query, 'sort')) {
+    let order = 'asc';
+
+    if (Object.prototype.hasOwnProperty.call(request.query, 'order')) {
+      order = request.query.order;
+    }
+
+    options.sort = { [request.query.sort]: order };
+  }
+
+  if (Object.prototype.hasOwnProperty.call(request.query, 'limit')) {
+    options.limit = Math.min(parseInt(request.query.limit, 10), 100);
+  }
+
+  try {
+    if (
+      Object.keys(query).length !== 0 ||
+      Object.prototype.hasOwnProperty.call(request.query, 'sort')
+    ) {
+      challanges = await Challange.find(query, {}, options);
+    }
+
+    return response.json(challanges);
+  } catch (error) {
+    return response.status(400).json(error);
+  }
 });
 
 /**
- * Finds archived challanges associated to signed in user (creator or competitor)
+ * Returns challange information for specific challange.
  * Method: GET
- * @returns {Array<Object>} List of challanges
+ * @returns {Object} Challange
  */
-router.get('/archived', auth, async (request, response) => {
-  const challanges = await challangedb.getArchivedChallangesOfUser(
-    request.userId
-  );
-  if (challanges !== null) {
-    return response.json(challanges);
+router.get('/:id', auth, async (request, response) => {
+  try {
+    const challange = await Challange.findById(
+      request.params.id,
+      {},
+      {
+        populate: [
+          {
+            path: 'participants',
+            select: ['username', 'score'],
+          },
+          {
+            path: 'creator',
+            select: ['username', 'score'],
+          },
+        ],
+      }
+    );
+
+    if (challange.visibility === 'private') {
+      if (String(challange.creator._id) === request.userId) {
+        return response.json(challange);
+      }
+
+      for (let i = 0; i < challange.participants.length; i += 1) {
+        if (String(challange.participants[i]._id) === request.userId) {
+          return response.json(challange);
+        }
+      }
+
+      return response.status(401).json();
+    }
+
+    return response.json(challange);
+  } catch (error) {
+    return response.status(400).json(error);
   }
-  return response.status(400).json(challanges);
 });
 
 /**
  * Creates a new challange as signed in user
  * Method: POST
- * @param  {string} name
- * @param  {string} description
- * @param  {string} category
- * @param  {Date} startDate
- * @param  {Date} endDate
- * @param  {number} repetitions
- * @param  {string} timespan
- * @param  {string} visibility
- * @param {Array<string>} [competitors]
+ * @param {string} name
+ * @param {string} description
+ * @param {string} category
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @param {number} repetitions
+ * @param {string} timespan
+ * @param {string} visibility
+ * @param {Array<string>} [participants]
  * @returns {Object} Created challange
  */
 router.post(
-  '/create',
+  '/',
   auth,
   body('name').isString().isLength({ min: 6, max: 255 }),
   body('description').isString().isLength({ min: 6, max: 1023 }),
   body('category').isString(),
-  body('startDate').isDate(), // yyyy-mm-dd
+  body('startDate').isDate(),
   body('endDate').isDate(),
   body('repetitions').isInt(),
   body('timespan').isString(),
   body('visibility').isString(),
-  body('competitors').isArray(),
   async (request, response) => {
     // Find validation errors and wrap them in an object
     const errors = validationResult(request);
@@ -91,16 +156,12 @@ router.post(
         errors: errors.array(),
       });
     }
-    // Check dates
-    const dateArray = formatDateService.formatDate(
-      request.body.startDate,
-      request.body.endDate
-    );
-    const startDate = dateArray[0];
-    const endDate = dateArray[1];
-    const today = dateArray[2];
 
-    if (startDate < today) {
+    // Check dates
+    const startDate = new Date(request.body.startDate);
+    const endDate = new Date(request.body.endDate);
+
+    if (startDate < new Date()) {
       return response.status(400).json({
         error: 'The start date can not be set to earlier than today.',
       });
@@ -108,91 +169,146 @@ router.post(
 
     if (endDate <= startDate) {
       return response.status(400).json({
-        error:
-          'The end date can not be set to equal or earlier than the start date.',
+        error: `The end date can not be set to equal or earlier than the start
+          date.`,
       });
     }
 
-    // Check if user is also in competitors
-    if (request.body.competitors.includes(request.userId)) {
+    // Check if signed in user is also participant
+    if (request.body.participants.includes(request.userId)) {
       return response.status(400).json({
-        error:
-          'The creator of this challange can not be added as a competitor.',
+        error: 'The creator can not be added as a participant.',
       });
     }
 
-    // calculate total repetitions and amount of Intervals
-    const totalAmountOfRepetitions = challangeService.calculateAmountOfRepetitions(
-      startDate,
-      endDate,
-      request.body.timespan,
-      request.body.repetitions
-    );
-    const intervals = Math.round(
-      totalAmountOfRepetitions / request.body.repetitions
-    );
+    // Check participants
+    if (request.body.participants && Array.isArray(request.body.participants)) {
+      for (let i = 0; i < request.body.participants.length; i += 1) {
+        if (!ObjectID.isValid(request.body.participants[i])) {
+          return response.status(400).json({
+            error: 'Participant ID not valid.',
+          });
+        }
+
+        try {
+          /* eslint-disable-next-line */
+          await User.findById(request.body.participants[i]);
+        } catch (error) {
+          return response.status(400).json({
+            error: 'Participant ID does not exist.',
+          });
+        }
+      }
+    }
 
     // Create new challange
-    const savedChallange = await challangedb.createNewChallange(
-      request,
-      totalAmountOfRepetitions,
-      intervals
-    );
+    const requestBody = { ...request.body };
+    delete requestBody.participants;
 
-    // add creator to leaderboard list
-    await challangeLeaderboarddb.saveUserToLeaderboard(
-      savedChallange.creator,
-      savedChallange._id,
-      'active'
-    );
+    const newChallange = new Challange({
+      ...requestBody,
+      creator: request.userId,
+    });
 
-    if (savedChallange !== null) {
-      return response.json(savedChallange);
+    // Create challange invitations
+    const newChallangeInvitations = [];
+
+    if (request.body.participants && Array.isArray(request.body.participants)) {
+      request.body.participants.forEach((participant) => {
+        const newChallangeInvitation = new ChallangeInvitation({
+          sender: request.userId,
+          receiver: participant,
+          challange: newChallange._id,
+        });
+
+        newChallangeInvitations.push(newChallangeInvitation);
+      });
     }
-    return response.status(400).json(savedChallange);
+
+    // Save challange
+    let savedNewChallange = null;
+
+    try {
+      savedNewChallange = await newChallange.save();
+    } catch (error) {
+      return response.status(400).json({
+        error: 'Error while saving challange.',
+      });
+    }
+
+    // Save challange invitations
+    for (let i = 0; i < newChallangeInvitations.length; i += 1) {
+      try {
+        /* eslint-disable-next-line */
+        await newChallangeInvitations[i].save();
+      } catch (error) {
+        // Delete created challange and all created invitations again
+        try {
+          /* eslint-disable */
+          await ChallangeInvitation.deleteMany({ challange: newChallange._id });
+          await Challange.findByIdAndDelete(newChallange._id);
+          /* eslint-enable */
+        } catch (deleteError) {
+          return response.status(400).json({
+            error: `Error while deleting already created entries of failed
+              request`,
+          });
+        }
+
+        return response.status(400).json({
+          error: 'Error while saving challange invitations.',
+        });
+      }
+    }
+
+    return response.json(savedNewChallange);
   }
 );
 
 /**
- * Update Challange with attendees
+ * Updates challange information for specific challange.
  * Method: PATCH
- * @returns {Object} Created challange
+ * @returns {Object} Updated challange
  */
-router.patch('/addattendees', auth, async (request, response) => {
-  // TODO Don't add users here -> send each user an invitation in this route
-  const competitorIds = userService.mapUsernamesToIds(request.body.competitors);
-  const challange = await challangedb.getChallangeByName(request.body.name);
+router.patch('/:id', auth, async (request, response) => {
   try {
-    // s
-    for (let i = 0; i < competitorIds.length; i++) {
-      invitationdb.saveInvitation(request, competitorIds[i], challange._id);
+    const challange = await Challange.findById(request.params.id);
+
+    // check permission
+    if (String(challange.creator._id) !== request.userId) {
+      return response.status(401).json();
     }
-    // add attendees to leaderboard list
-    for (let i = 0; i < competitorIds.length; i++) {
-      await challangeLeaderboarddb.saveUserToLeaderboard(
-        competitorIds[i],
-        challange._id,
-        'passive'
-      );
+
+    // deny adding participants without invitation
+    if (request.body.participants) {
+      return response.status(400).json({
+        error: `Participants can not be updated directly. Send an invitation or
+          remove them explicitly.`,
+      });
     }
-    return response.json('saved');
+
+    await Challange.findByIdAndUpdate(request.params.id, request.body);
+    const updatedChallange = await Challange.findById(
+      request.params.id,
+      {},
+      {
+        populate: [
+          {
+            path: 'participants',
+            select: ['username', 'score'],
+          },
+          {
+            path: 'creator',
+            select: ['username', 'score'],
+          },
+        ],
+      }
+    );
+
+    return response.json(updatedChallange);
   } catch (error) {
     return response.status(400).json(error);
   }
-});
-
-/**
- * Get Information of specific Challange (id)
- * Method: GET
- * @returns {Object} Challange
- */
-router.get('/:id', auth, async (request, response) => {
-  // Check if ID matches one in the users table and change archived to true
-  const challange = await challangedb.getChallangeById(request.params.id);
-  if (challange !== null) {
-    return response.json(challange);
-  }
-  return response.status(400).json(challange);
 });
 
 module.exports = router;

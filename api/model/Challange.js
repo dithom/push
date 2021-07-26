@@ -1,8 +1,6 @@
 import mongoose from 'mongoose';
 import idValidator from 'mongoose-id-validator';
 
-// Child Referencing: the parent references its children.
-
 const ChallangeSchema = mongoose.Schema({
   name: {
     type: String,
@@ -33,15 +31,6 @@ const ChallangeSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  maximumRepetitions: {
-    type: Number,
-    required: true,
-  },
-  // wie of müssen repititions durchgeführt werden?
-  intervals: {
-    type: Number,
-    required: true,
-  },
   timespan: {
     type: String,
     required: true,
@@ -58,12 +47,16 @@ const ChallangeSchema = mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  competitors: [
+  participants: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
   ],
+  __v: {
+    type: Number,
+    select: false,
+  },
 });
 
 module.exports = mongoose.model(

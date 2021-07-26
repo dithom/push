@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 import idValidator from 'mongoose-id-validator';
 
-// Child Referencing: the parent references its children.
-// TODO anderes Schema überlegen, bei einer logActivity braucht es keine message
-const InvitationSchema = mongoose.Schema({
+/* TODO Find solution for accepted and declined invitations, as they dont
+need to stay in the db. Maybe a clean up cronjob with a limit of 30 days?
+*/
+
+const ChallangeInvitationSchema = mongoose.Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -19,19 +21,19 @@ const InvitationSchema = mongoose.Schema({
     ref: 'Challange',
     required: true,
   },
-  date: {
-    type: Date,
-    required: true,
-  },
-  invitationstatus: {
+  status: {
     type: String,
     required: true,
     default: 'pending',
     enum: ['pending', 'declined', 'accepted'],
   },
+  __v: {
+    type: Number,
+    select: false,
+  },
 });
 
 module.exports = mongoose.model(
-  'Invitation',
-  InvitationSchema.plugin(idValidator)
+  'ChallangeInvitation',
+  ChallangeInvitationSchema.plugin(idValidator)
 );
