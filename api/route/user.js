@@ -68,10 +68,8 @@ router.get('/', auth, async (request, response) => {
 
     return response.json(users);
   } catch (error) {
-    //
+    return response.status(400).json(error);
   }
-
-  return response.status(400).json();
 });
 
 /**
@@ -84,10 +82,8 @@ router.get('/me', auth, async (request, response) => {
     const user = await User.findById(request.userId);
     return response.json(user);
   } catch (error) {
-    //
+    return response.status(400).json(error);
   }
-
-  return response.status(400).json();
 });
 
 /**
@@ -105,10 +101,8 @@ router.patch('/me', auth, async (request, response) => {
     const updatedUser = await User.findById(request.userId);
     return response.json(updatedUser);
   } catch (error) {
-    //
+    return response.status(400).json(error);
   }
-
-  return response.status(400).json();
 });
 
 /**
@@ -154,10 +148,8 @@ router.get('/me/challanges', auth, async (request, response) => {
 
     return response.json(challanges);
   } catch (error) {
-    //
+    return response.status(400).json(error);
   }
-
-  return response.status(400).json();
 });
 
 /**
@@ -179,10 +171,8 @@ router.get('/:idOrUsername', auth, async (request, response) => {
 
     return response.json(user);
   } catch (error) {
-    //
+    return response.status(400).json(error);
   }
-
-  return response.status(400).json();
 });
 
 module.exports = router;
