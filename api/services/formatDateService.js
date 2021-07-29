@@ -1,3 +1,9 @@
+/**
+ * formats date inputs in yyyy-mm-dd format
+ * @param {date} startDateInput
+ * @param {date} endDateInput
+ * @returns {Array} formatted Dates in an Array
+ */
 function formatDate(startDateInput, endDateInput) {
   // Check dates
   const startDate = new Date(startDateInput);

@@ -3,6 +3,14 @@ import challangedb from '../database/challangedb';
 // Import Service Functions
 import formatDateService from './formatDateService';
 
+/**
+ * Returns total amounts of repetitions of the challange, depending on chosen timespan
+ * @param {date} startdate
+ * @param {date} enddate
+ * @param {string} timespan
+ * @param {number} repetitions
+ * @returns {number} totalAmountOfRepetitions
+ */
 function calculateAmountOfRepetitions(
   startDate,
   endDate,
@@ -40,6 +48,11 @@ function calculateAmountOfRepetitions(
   return totalAmountOfRepetitions;
 }
 
+/**
+ * identifies the current interval in the challange depending on the current date
+ * @param {Object} challangeId
+ * @returns {number} currentInterval
+ */
 async function identifyCurrentInterval(challangeId) {
   let challange = 0;
   try {

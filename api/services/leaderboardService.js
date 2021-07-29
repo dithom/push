@@ -3,6 +3,11 @@ import invitationdb from '../database/invitationdb';
 import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
 import challangedb from '../database/challangedb';
 
+/**
+ * create leaderboard of all users, sort by highscore
+ * @param {Object} Users Object
+ * @returns {Array} leaderboard sorted by highscore
+ */
 async function createLeaderboard(Users) {
   const highscoreList = [];
 
@@ -20,16 +25,22 @@ async function createLeaderboard(Users) {
   return highscoreList;
 }
 
+/**
+ * update invitation answer in challange leaderboard
+ * @param {id} invitationid Object
+ * @param {String} answer given answer to an invitation of user
+ * @returns {object} updated invitation
+ */
 async function updateInvitationAnswer(invitationid, answer) {
   const invitation = await invitationdb.getInvitationById(invitationid);
   const challange = await challangedb.getChallangeById(invitation.challange);
 
-  const updatedInvitation = await challangeLeaderboarddb.updateInvitationStatus(
+  const updatedLeaderboard = await challangeLeaderboarddb.updateInvitationStatus(
     invitation.receiver,
     challange.id,
     answer
   );
-  return updatedInvitation;
+  return updatedLeaderboard;
 }
 
 module.exports = {

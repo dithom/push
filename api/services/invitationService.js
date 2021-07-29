@@ -4,6 +4,11 @@ import challangedb from '../database/challangedb';
 import invitationdb from '../database/invitationdb';
 import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
 
+/**
+ * creates invitation objects for all participants
+ * @param {Object} Invitation Object
+ * @returns {Array} List of Invitations
+ */
 async function createInvitations(invitations) {
   const invitationList = [];
 
@@ -25,6 +30,12 @@ async function createInvitations(invitations) {
   return invitationList;
 }
 
+/**
+ * updates answer of user in invitation and leaderboard database
+ * @param {id} invitationid Object
+ * @param {String} answer given answer to an invitation of user
+ * @returns {Object} updated invitations
+ */
 async function updateInvitationAnswer(invitationid, answer) {
   const invitation = await invitationdb.getInvitationById(invitationid);
   const challange = await challangedb.getChallangeById(invitation.challange);

@@ -6,6 +6,11 @@ import challangeFeeddb from '../database/challangeFeeddb';
 import challangeLeaderboarddb from '../database/challangeLeaderboarddb';
 import userdb from '../database/userdb';
 
+/**
+ * Listens to messages and logged Activities of users in challange chat and broadcasts them to all challange participants
+ * @param {socketio} io
+ * @returns {object#} updated invitation
+ */
 function socketListener(io) {
   // event listeners (chatMessages and logActivity)
   io.on('connection', (socket) => {
